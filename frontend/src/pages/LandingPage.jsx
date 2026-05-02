@@ -272,8 +272,13 @@ const LandingPage = () => {
         </motion.div>
       </section>
 
-      <footer className="relative z-10 py-10 text-center text-slate-500 border-t border-white/5 bg-[#050505]">
-        <p className="font-bold text-sm tracking-wide">© 2026 SkillXchange. Built for the future of learning.</p>
+      <footer className="relative z-10 py-10 border-t border-white/5 bg-[#050505]">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500">
+          <p className="font-bold text-sm tracking-wide">© 2026 SkillXchange. Built for the future of learning.</p>
+          <div className="flex gap-6">
+            <Link to="/admin" className="text-sm font-bold hover:text-white transition-colors">Admin Panel</Link>
+          </div>
+        </div>
       </footer>
     </div>
   );

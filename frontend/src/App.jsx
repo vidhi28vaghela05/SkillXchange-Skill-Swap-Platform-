@@ -9,6 +9,7 @@ import Matches from './pages/Matches';
 import Requests from './pages/Requests';
 import Chat from './pages/Chat';
 import MessagesList from './pages/MessagesList';
+import AdminDashboard from './pages/AdminDashboard';
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -31,6 +32,7 @@ function App() {
               <Route path="/requests" element={<PrivateRoute><Requests /></PrivateRoute>} />
               <Route path="/messages" element={<PrivateRoute><MessagesList /></PrivateRoute>} />
               <Route path="/chat/:userId" element={<PrivateRoute><Chat /></PrivateRoute>} />
+              <Route path="/admin" element={<AdminDashboard />} />
             </Routes>
           </main>
         </div>
