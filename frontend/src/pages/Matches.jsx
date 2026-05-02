@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { motion } from 'framer-motion';
-import { Send, CheckCircle, Search, User, ExternalLink } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, CheckCircle, Search, User, ExternalLink, Heart } from 'lucide-react';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
@@ -9,6 +9,7 @@ const Matches = () => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sentRequests, setSentRequests] = useState([]);
+  const [bookmarks, setBookmarks] = useState(() => JSON.parse(localStorage.getItem('bookmarks') || '[]'));
 
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -29,6 +30,18 @@ const Matches = () => {
     };
     fetchMatches();
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+  }, [bookmarks]);
+
+  const toggleBookmark = (id) => {
+    if (bookmarks.includes(id)) {
+      setBookmarks(bookmarks.filter(b => b !== id));
+    } else {
+      setBookmarks([...bookmarks, id]);
+    }
+  };
 
   const sendRequest = async (toUserId) => {
     try {
@@ -87,20 +100,33 @@ const Matches = () => {
         </Card>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMatches.map((match, index) => (
+          {filteredMatches.map((match, index) => {
+            const isBookmarked = bookmarks.includes(match._id);
+            return (
             <Card 
               key={match._id}
               transition={{ delay: index * 0.1 }}
-              className="group !p-0 flex flex-col h-full"
+              className="group !p-0 flex flex-col h-full relative overflow-hidden"
             >
-              <div className="p-5 flex-grow">
+              {isBookmarked && (
+                <div className="absolute -top-10 -right-10 w-24 h-24 bg-rose-500/10 rounded-full blur-xl pointer-events-none"></div>
+              )}
+              <div className="p-5 flex-grow relative z-10">
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/40 dark:to-secondary-900/40 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400 font-black text-xl shadow-inner">
                     {match.name.charAt(0)}
                   </div>
-                  <div className="bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
-                    <ExternalLink size={16} />
-                  </div>
+                  <motion.button 
+                    whileTap={{ scale: 0.8 }}
+                    onClick={() => toggleBookmark(match._id)}
+                    className={`p-2 rounded-full transition-colors ${
+                      isBookmarked 
+                        ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-500' 
+                        : 'bg-slate-50 dark:bg-white/5 text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10'
+                    }`}
+                  >
+                    <Heart size={18} className={isBookmarked ? 'fill-rose-500' : ''} />
+                  </motion.button>
                 </div>
                 
                 <h3 className="text-lg font-black text-slate-800 dark:text-slate-100 mb-0.5">{match.name}</h3>
@@ -142,7 +168,8 @@ const Matches = () => {
                 )}
               </div>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

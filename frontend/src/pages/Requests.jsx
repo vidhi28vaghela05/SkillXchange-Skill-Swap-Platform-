@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, ArrowUpRight, ArrowDownLeft, Clock, Inbox } from 'lucide-react';
+import { Check, X, ArrowUpRight, ArrowDownLeft, Clock, Inbox, MessageSquare } from 'lucide-react';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
@@ -89,8 +90,14 @@ const Requests = () => {
                       </div>
                       <div>
                         <h4 className="font-black text-slate-800 dark:text-slate-200 text-base">{req.fromUser.name}</h4>
-                        <p className="text-slate-400 dark:text-slate-500 text-xs font-semibold">{req.fromUser.email}</p>
-                        <div className="mt-1.5 flex items-center gap-2">
+                        <p className="text-slate-400 dark:text-slate-500 text-xs font-semibold mb-2">{req.fromUser.email}</p>
+                        {req.fromUser.offers && req.fromUser.wants && (
+                          <div className="flex flex-wrap gap-2 text-[10px] uppercase font-bold mb-2">
+                            <span className="bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 px-2 py-0.5 rounded">Offers: {req.fromUser.offers.join(', ')}</span>
+                            <span className="bg-secondary-100 dark:bg-secondary-900/40 text-secondary-600 dark:text-secondary-400 px-2 py-0.5 rounded">Wants: {req.fromUser.wants.join(', ')}</span>
+                          </div>
+                        )}
+                        <div className="mt-1 flex items-center gap-2">
                           <StatusBadge status={req.status} />
                           <span className="text-[9px] text-slate-300 dark:text-slate-500 font-bold flex items-center gap-1">
                             <Clock size={10} /> {new Date(req.createdAt).toLocaleDateString()}
@@ -118,11 +125,11 @@ const Requests = () => {
                       </div>
                     )}
                     {req.status === 'accepted' && (
-                      <a href={`mailto:${req.fromUser.email}`} className="flex-1 sm:flex-none">
+                      <Link to={`/chat/${req.fromUser._id}`} className="flex-1 sm:flex-none">
                         <Button className="w-full sm:w-auto !p-2 px-4 !rounded-lg bg-indigo-600 hover:bg-indigo-700 flex items-center gap-2 text-xs">
-                           Email <ArrowUpRight size={14} />
+                           Message <MessageSquare size={14} />
                         </Button>
-                      </a>
+                      </Link>
                     )}
                   </Card>
                 ))}
@@ -159,8 +166,14 @@ const Requests = () => {
                       </div>
                       <div>
                         <h4 className="font-black text-slate-800 dark:text-slate-200 text-base">{req.toUser.name}</h4>
-                        <p className="text-slate-400 dark:text-slate-500 text-xs font-semibold">{req.toUser.email}</p>
-                        <div className="mt-1.5 flex items-center gap-2">
+                        <p className="text-slate-400 dark:text-slate-500 text-xs font-semibold mb-2">{req.toUser.email}</p>
+                        {req.toUser.offers && req.toUser.wants && (
+                          <div className="flex flex-wrap gap-2 text-[10px] uppercase font-bold mb-2">
+                            <span className="bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 px-2 py-0.5 rounded">Offers: {req.toUser.offers.join(', ')}</span>
+                            <span className="bg-secondary-100 dark:bg-secondary-900/40 text-secondary-600 dark:text-secondary-400 px-2 py-0.5 rounded">Wants: {req.toUser.wants.join(', ')}</span>
+                          </div>
+                        )}
+                        <div className="mt-1 flex items-center gap-2">
                           <StatusBadge status={req.status} />
                           <span className="text-[9px] text-slate-300 dark:text-slate-500 font-bold flex items-center gap-1">
                             <Clock size={10} /> {new Date(req.createdAt).toLocaleDateString()}
@@ -169,11 +182,11 @@ const Requests = () => {
                       </div>
                     </div>
                     {req.status === 'accepted' && (
-                      <a href={`mailto:${req.toUser.email}`} className="mt-4 sm:mt-0 w-full sm:w-auto">
+                      <Link to={`/chat/${req.toUser._id}`} className="mt-4 sm:mt-0 w-full sm:w-auto">
                         <Button className="w-full sm:w-auto !p-2 px-4 !rounded-lg bg-emerald-600 hover:bg-emerald-700 flex items-center justify-center gap-2 text-xs">
-                           Email <ArrowUpRight size={14} />
+                           Message <MessageSquare size={14} />
                         </Button>
-                      </a>
+                      </Link>
                     )}
                   </Card>
                 ))}

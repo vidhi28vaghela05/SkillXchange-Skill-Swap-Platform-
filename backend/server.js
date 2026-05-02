@@ -15,6 +15,7 @@ app.use(cors());
 app.use('/auth', require('./routes/auth'));
 app.use('/users', require('./routes/user'));
 app.use('/swap', require('./routes/swap'));
+app.use('/messages', require('./routes/message'));
 
 // Database Connection
 const PORT = process.env.PORT || 5000;

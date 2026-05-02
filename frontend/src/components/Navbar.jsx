@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User, Zap, MessageSquare, Search, Moon, Sun } from 'lucide-react';
+import { LogOut, User, Zap, MessageSquare, Search, Moon, Sun, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../api/axios';
 
@@ -16,22 +16,28 @@ const Navbar = () => {
            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
   });
   const [pendingCount, setPendingCount] = useState(0);
+  const [unreadMsgCount, setUnreadMsgCount] = useState(0);
 
   useEffect(() => {
     if (user) {
-      const fetchPending = async () => {
+      const fetchData = async () => {
         try {
+          // Fetch swap requests
           const res = await api.get('/swap/my');
           const pending = res.data.received.filter(req => req.status === 'pending');
           setPendingCount(pending.length);
+
+          // Fetch unread messages count
+          const msgRes = await api.get('/messages/unread/count');
+          setUnreadMsgCount(msgRes.data.count);
         } catch (err) {
           console.error(err);
         }
       };
-      fetchPending();
+      fetchData();
       
-      // Poll every 10 seconds for demo purposes
-      const interval = setInterval(fetchPending, 10000);
+      // Poll every 5 seconds for demo purposes
+      const interval = setInterval(fetchData, 5000);
       return () => clearInterval(interval);
     }
   }, [user]);
@@ -51,9 +57,11 @@ const Navbar = () => {
   };
 
   const navLinks = [
+    { name: 'Home', path: '/', icon: Home },
     { name: 'Profile', path: '/dashboard', icon: User },
     { name: 'Matches', path: '/matches', icon: Search },
-    { name: 'Requests', path: '/requests', icon: MessageSquare },
+    { name: 'Requests', path: '/requests', icon: Zap },
+    { name: 'Messages', path: '/messages', icon: MessageSquare },
   ];
 
   return (
@@ -94,6 +102,11 @@ const Navbar = () => {
                     {link.name === 'Requests' && pendingCount > 0 && (
                       <span className="absolute top-1 right-2 w-4 h-4 bg-red-500 text-white text-[9px] font-bold flex items-center justify-center rounded-full animate-bounce">
                         {pendingCount}
+                      </span>
+                    )}
+                    {link.name === 'Messages' && unreadMsgCount > 0 && (
+                      <span className="absolute top-1 right-2 w-4 h-4 bg-red-500 text-white text-[9px] font-bold flex items-center justify-center rounded-full animate-bounce">
+                        {unreadMsgCount}
                       </span>
                     )}
                     {isActive && (

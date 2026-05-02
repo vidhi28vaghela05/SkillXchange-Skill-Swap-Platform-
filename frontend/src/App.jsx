@@ -7,6 +7,8 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Matches from './pages/Matches';
 import Requests from './pages/Requests';
+import Chat from './pages/Chat';
+import MessagesList from './pages/MessagesList';
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -17,9 +19,9 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0b] transition-colors duration-300">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#030014] transition-colors duration-300 relative text-slate-900 dark:text-white">
           <Navbar />
-          <main>
+          <main className="min-h-screen relative z-10">
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
@@ -27,6 +29,8 @@ function App() {
               <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
               <Route path="/matches" element={<PrivateRoute><Matches /></PrivateRoute>} />
               <Route path="/requests" element={<PrivateRoute><Requests /></PrivateRoute>} />
+              <Route path="/messages" element={<PrivateRoute><MessagesList /></PrivateRoute>} />
+              <Route path="/chat/:userId" element={<PrivateRoute><Chat /></PrivateRoute>} />
             </Routes>
           </main>
         </div>

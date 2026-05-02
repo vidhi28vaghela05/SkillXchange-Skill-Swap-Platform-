@@ -2,8 +2,10 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Zap, Shield, Users, ArrowRight, Star, CheckCircle, Sparkles, User } from 'lucide-react';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const LandingPage = () => {
+  const { user } = useAuth();
   const { scrollYProgress } = useScroll();
   const yHero = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const opacityHero = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
@@ -92,13 +94,22 @@ const LandingPage = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-5"
           >
-            <Link to="/register">
-              <Button className="px-8 py-4 text-base rounded-2xl group shadow-[0_0_40px_rgba(217,70,239,0.4)] hover:shadow-[0_0_60px_rgba(217,70,239,0.6)] !bg-gradient-to-r !from-fuchsia-600 !to-indigo-600 border-none transition-all overflow-hidden relative">
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
-                <span className="relative flex items-center gap-2">Get Started Free <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} /></span>
-              </Button>
-            </Link>
-            <Link to="/login">
+            {user ? (
+              <Link to="/dashboard">
+                <Button className="px-8 py-4 text-base rounded-2xl group shadow-[0_0_40px_rgba(217,70,239,0.4)] hover:shadow-[0_0_60px_rgba(217,70,239,0.6)] !bg-gradient-to-r !from-fuchsia-600 !to-indigo-600 border-none transition-all overflow-hidden relative">
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
+                  <span className="relative flex items-center gap-2">Go to Dashboard <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} /></span>
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/register">
+                <Button className="px-8 py-4 text-base rounded-2xl group shadow-[0_0_40px_rgba(217,70,239,0.4)] hover:shadow-[0_0_60px_rgba(217,70,239,0.6)] !bg-gradient-to-r !from-fuchsia-600 !to-indigo-600 border-none transition-all overflow-hidden relative">
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
+                  <span className="relative flex items-center gap-2">Get Started Free <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} /></span>
+                </Button>
+              </Link>
+            )}
+            <Link to={user ? "/matches" : "/login"}>
               <button className="px-8 py-4 text-base font-bold text-white border border-white/10 bg-white/5 backdrop-blur-md rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all shadow-xl">
                 View Live Matches
               </button>
@@ -245,11 +256,19 @@ const LandingPage = () => {
           <h2 className="text-4xl md:text-6xl font-black text-white mb-6 relative z-10 tracking-tight">Ready to join the <br /> skill revolution?</h2>
           <p className="text-slate-400 text-lg mb-10 relative z-10 max-w-lg mx-auto">Join thousands of professionals already accelerating their careers through mutual skill exchange.</p>
           
-          <Link to="/register" className="relative z-10 inline-block">
-            <Button className="px-10 py-4 text-lg bg-white !text-primary-900 hover:bg-slate-100 shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 rounded-2xl font-black">
-              Join Now — It's Free
-            </Button>
-          </Link>
+          {user ? (
+            <Link to="/dashboard" className="relative z-10 inline-block">
+              <Button className="px-10 py-4 text-lg bg-white !text-primary-900 hover:bg-slate-100 shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 rounded-2xl font-black">
+                Go to Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/register" className="relative z-10 inline-block">
+              <Button className="px-10 py-4 text-lg bg-white !text-primary-900 hover:bg-slate-100 shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 rounded-2xl font-black">
+                Join Now — It's Free
+              </Button>
+            </Link>
+          )}
         </motion.div>
       </section>
 
