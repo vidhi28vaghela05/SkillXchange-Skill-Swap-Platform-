@@ -10,6 +10,8 @@ const Matches = () => {
   const [loading, setLoading] = useState(true);
   const [sentRequests, setSentRequests] = useState([]);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
     const fetchMatches = async () => {
       try {
@@ -37,6 +39,15 @@ const Matches = () => {
     }
   };
 
+  const filteredMatches = matches.filter(match => {
+    const term = searchTerm.toLowerCase();
+    return (
+      match.name.toLowerCase().includes(term) ||
+      match.skillsOffered.some(s => s.toLowerCase().includes(term)) ||
+      match.skillsWanted.some(s => s.toLowerCase().includes(term))
+    );
+  });
+
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
       <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
@@ -45,82 +56,88 @@ const Matches = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-16">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
+    <div className="max-w-5xl mx-auto px-4 pt-24 pb-10">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div>
-          <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight mb-3">Discovery</h1>
-          <p className="text-slate-500 text-lg font-medium">Connect with people who have exactly what you need.</p>
+          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-1">Discovery</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Connect with people who have exactly what you need.</p>
         </div>
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+        <div className="relative w-full md:w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
           <input 
-            placeholder="Search skills..." 
-            className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 shadow-soft focus:ring-2 focus:ring-primary-500 focus:outline-none"
+            placeholder="Search skills or names..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 dark:text-white rounded-lg py-2.5 pl-10 pr-3 shadow-soft dark:shadow-none focus:ring-2 focus:ring-primary-500 focus:outline-none text-sm"
           />
         </div>
       </div>
 
-      {matches.length === 0 ? (
-        <Card className="p-20 text-center flex flex-col items-center">
-          <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
-            <Search className="text-slate-300 w-12 h-12" />
+      {filteredMatches.length === 0 ? (
+        <Card className="p-12 text-center flex flex-col items-center">
+          <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
+            <Search className="text-slate-300 dark:text-slate-500 w-8 h-8" />
           </div>
-          <h3 className="text-2xl font-bold text-slate-800 mb-2">No matches found yet</h3>
-          <p className="text-slate-500 max-w-sm mx-auto">Try adding more skills to your profile to increase your chances of finding a match!</p>
+          <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-1">No matches found</h3>
+          <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto text-sm">
+            {matches.length === 0 
+              ? "Try adding more skills to your profile to increase your chances of finding a match!"
+              : "No users matched your specific search criteria."}
+          </p>
         </Card>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {matches.map((match, index) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredMatches.map((match, index) => (
             <Card 
               key={match._id}
               transition={{ delay: index * 0.1 }}
-              className="group !p-0"
+              className="group !p-0 flex flex-col h-full"
             >
-              <div className="p-8 pb-0">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-2xl flex items-center justify-center text-primary-600 font-black text-2xl shadow-inner">
+              <div className="p-5 flex-grow">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/40 dark:to-secondary-900/40 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400 font-black text-xl shadow-inner">
                     {match.name.charAt(0)}
                   </div>
-                  <div className="bg-primary-50 text-primary-600 p-2 rounded-xl group-hover:rotate-12 transition-transform">
-                    <ExternalLink size={20} />
+                  <div className="bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
+                    <ExternalLink size={16} />
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-black text-slate-800 mb-1">{match.name}</h3>
-                <p className="text-slate-400 text-sm font-semibold mb-8">{match.email}</p>
+                <h3 className="text-lg font-black text-slate-800 dark:text-slate-100 mb-0.5">{match.name}</h3>
+                <p className="text-slate-400 dark:text-slate-500 text-xs font-semibold mb-5">{match.email}</p>
                 
-                <div className="space-y-6 mb-8">
+                <div className="space-y-4 mb-4">
                   <div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-3">Offers</span>
-                    <div className="flex flex-wrap gap-2">
+                    <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.1em] block mb-2">Offers</span>
+                    <div className="flex flex-wrap gap-1.5">
                       {match.skillsOffered.map(s => (
-                        <span key={s} className="bg-slate-50 text-slate-600 text-xs px-3 py-1.5 rounded-lg font-bold border border-slate-100">{s}</span>
+                        <span key={s} className="bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 text-[10px] px-2 py-1 rounded font-bold border border-slate-100 dark:border-white/5">{s}</span>
                       ))}
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-3">Wants</span>
-                    <div className="flex flex-wrap gap-2">
+                    <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.1em] block mb-2">Wants</span>
+                    <div className="flex flex-wrap gap-1.5">
                       {match.skillsWanted.map(s => (
-                        <span key={s} className="bg-primary-50 text-primary-600 text-xs px-3 py-1.5 rounded-lg font-bold border border-primary-100">{s}</span>
+                        <span key={s} className="bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 text-[10px] px-2 py-1 rounded font-bold border border-primary-100 dark:border-primary-500/20">{s}</span>
                       ))}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="p-8 pt-0 mt-auto">
+              <div className="p-5 pt-0 mt-auto">
                 {sentRequests.includes(match._id) ? (
-                  <div className="w-full py-4 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center gap-2 font-bold cursor-not-allowed border border-slate-100">
-                    <CheckCircle size={20} /> Request Sent
+                  <div className="w-full py-2.5 bg-slate-50 dark:bg-white/5 text-slate-400 dark:text-slate-500 rounded-lg flex items-center justify-center gap-1.5 font-bold cursor-not-allowed border border-slate-100 dark:border-white/5 text-sm">
+                    <CheckCircle size={16} /> Request Sent
                   </div>
                 ) : (
                   <Button 
                     onClick={() => sendRequest(match._id)}
-                    className="w-full py-4 rounded-2xl text-base"
+                    className="w-full py-2.5 rounded-lg text-sm"
                   >
-                    Connect <Send size={18} />
+                    Connect <Send size={14} />
                   </Button>
                 )}
               </div>

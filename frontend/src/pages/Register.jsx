@@ -25,20 +25,20 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-50 via-slate-50 to-secondary-50">
+    <div className="min-h-screen pt-14 flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-50 via-slate-50 to-secondary-50 dark:from-primary-900/20 dark:via-[#0a0a0b] dark:to-secondary-900/20">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-primary-500/10 w-full max-w-md border border-white"
+        className="bg-white dark:bg-[#111113] p-6 md:p-8 rounded-2xl shadow-xl shadow-primary-500/5 dark:shadow-none w-full max-w-sm border border-white dark:border-white/5"
       >
-        <div className="text-center mb-10">
-          <h2 className="text-4xl font-extrabold text-slate-900 mb-3">Create Account</h2>
-          <p className="text-slate-500 font-medium">Join our community of skill swappers</p>
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-1">Create Account</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Join our community of skill swappers</p>
         </div>
 
-        {error && <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="bg-red-50 text-red-600 p-4 rounded-2xl mb-8 text-center text-sm font-semibold border border-red-100">{error}</motion.div>}
+        {error && <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 p-3 rounded-lg mb-6 text-center text-xs font-semibold border border-red-100 dark:border-red-500/20">{error}</motion.div>}
         
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Input 
             icon={User} 
             label="Full Name" 
@@ -66,12 +66,12 @@ const Register = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <Button type="submit" className="w-full py-4 text-lg mt-4">
-            Get Started <ArrowRight size={20} />
+          <Button type="submit" className="w-full py-2.5 mt-2">
+            Get Started <ArrowRight size={16} />
           </Button>
         </form>
         
-        <p className="text-center mt-10 text-slate-500 font-medium">
+        <p className="text-center mt-6 text-slate-500 text-sm font-medium">
           Already have an account? <Link to="/login" className="text-primary-600 font-bold hover:text-primary-700 underline decoration-2 underline-offset-4">Log in</Link>
         </p>
       </motion.div>

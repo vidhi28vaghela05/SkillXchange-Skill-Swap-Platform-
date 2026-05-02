@@ -11,9 +11,9 @@ const Button = ({ children, variant = 'primary', className = '', ...props }) => 
 
   return (
     <motion.button
-      whileHover={{ y: -2 }}
+      whileHover={{ y: -1 }}
       whileTap={{ scale: 0.95 }}
-      className={`px-6 py-2.5 rounded-xl font-semibold btn-transition flex items-center justify-center gap-2 ${variants[variant]} ${className}`}
+      className={`px-4 py-2 rounded-lg text-sm font-semibold btn-transition flex items-center justify-center gap-2 ${variants[variant]} ${className}`}
       {...props}
     >
       {children}

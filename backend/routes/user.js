@@ -33,12 +33,20 @@ router.get('/match', auth, async (req, res) => {
   try {
     const currentUser = await User.findById(req.user.id);
     
-    // Logic: Find users who offer what I want AND want what I offer
-    const matches = await User.find({
+    let matches = await User.find({
       _id: { $ne: currentUser._id },
-      skillsOffered: { $in: currentUser.skillsWanted },
-      skillsWanted: { $in: currentUser.skillsOffered }
+      $or: [
+        { skillsOffered: { $in: currentUser.skillsWanted } },
+        { skillsWanted: { $in: currentUser.skillsOffered } }
+      ]
     }).select('-password');
+
+    // If no perfect matches, just return all other users for demo purposes
+    if (matches.length === 0) {
+      matches = await User.find({
+        _id: { $ne: currentUser._id }
+      }).select('-password').limit(10); // Show max 10 as suggestions
+    }
 
     res.json(matches);
   } catch (err) {
