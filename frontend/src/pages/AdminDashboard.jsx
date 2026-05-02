@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, BookOpen, Activity, Settings, TrendingUp, BarChart3, ShieldCheck, Search, MoreVertical, X } from 'lucide-react';
+import { Users, BookOpen, Activity, Settings, TrendingUp, BarChart3, ShieldCheck, Search, MoreVertical, X, Sparkles, Zap } from 'lucide-react';
 import Card from '../components/Card';
 import api from '../api/axios';
 
@@ -342,6 +342,85 @@ const AdminDashboard = () => {
           )}
         </motion.div>
       </div>
+
+      {/* User Details Modal */}
+      <AnimatePresence>
+        {selectedUser && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedUser(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            ></motion.div>
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 w-full max-w-lg rounded-2xl shadow-2xl relative z-10 overflow-hidden"
+            >
+              <div className="bg-gradient-to-r from-primary-600 to-secondary-600 h-24 relative">
+                <button 
+                  onClick={() => setSelectedUser(null)}
+                  className="absolute top-4 right-4 p-1.5 bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              
+              <div className="px-6 pb-6 pt-0 relative">
+                <div className="w-20 h-20 bg-slate-50 dark:bg-[#0a0a0b] rounded-full flex items-center justify-center text-3xl font-black text-slate-800 dark:text-white border-4 border-white dark:border-[#111113] shadow-lg absolute -top-10 left-6">
+                  {selectedUser.name.charAt(0)}
+                </div>
+                
+                <div className="mt-14">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-0.5">{selectedUser.name}</h2>
+                      <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">{selectedUser.email}</p>
+                    </div>
+                    <span className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold px-3 py-1 rounded-full">
+                      Active User
+                    </span>
+                  </div>
+                  
+                  <div className="mt-8 space-y-6">
+                    <div>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                        <Sparkles size={14} className="text-primary-500" /> Skills Offered
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedUser.skillsOffered?.map(s => (
+                          <span key={s} className="bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200 dark:border-white/5">{s}</span>
+                        ))}
+                        {(!selectedUser.skillsOffered || selectedUser.skillsOffered.length === 0) && (
+                          <span className="text-slate-400 text-sm italic">No skills offered yet.</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                        <Zap size={14} className="text-secondary-500" /> Skills Wanted
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedUser.skillsWanted?.map(s => (
+                          <span key={s} className="bg-primary-50 dark:bg-primary-500/10 text-primary-700 dark:text-primary-300 px-3 py-1.5 rounded-lg text-sm font-bold border border-primary-200 dark:border-primary-500/20">{s}</span>
+                        ))}
+                        {(!selectedUser.skillsWanted || selectedUser.skillsWanted.length === 0) && (
+                          <span className="text-slate-400 text-sm italic">No skills wanted yet.</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
