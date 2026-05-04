@@ -1,117 +1,147 @@
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 const NeonRibbon = () => {
-  const canvasRef = useRef(null);
-  const mouse = useRef({ x: 0, y: 0 });
-  const points = useRef([]);
-  const MAX_POINTS = 50;
+    const canvasRef = useRef(null);
+    const { isDark } = useTheme();
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    let animationFrameId;
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
 
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
 
-    const handleMouseMove = (e) => {
-      mouse.current = { x: e.clientX, y: e.clientY };
-      
-      // Add point to history
-      points.current.push({ x: e.clientX, y: e.clientY });
-      if (points.current.length > MAX_POINTS) {
-        points.current.shift();
-      }
-    };
+        // --- Configuration ---
+        const STRAND_COUNT = 15;      // Number of lines in the cable
+        const HISTORY_LENGTH = 30;    // How long the tail is
+        const BASE_RADIUS = 15;       // How wide the cable spreads
+        
+        // --- State ---
+        let width = 0;
+        let height = 0;
+        let frame = 0;
 
-    window.addEventListener('resize', resizeCanvas);
-    window.addEventListener('mousemove', handleMouseMove);
-    resizeCanvas();
+        // Mouse state
+        const mouse = { x: 0, y: 0, vX: 0, vY: 0 };
+        const target = { x: 0, y: 0 };
 
-    const colors = [
-      '#FF0080', // Fuchsia
-      '#7928CA', // Purple
-      '#0070F3', // Blue
-      '#00DFD8', // Cyan
-      '#FF4D4D', // Red
-    ];
+        // --- Class Definition ---
+        class Strand {
+            constructor(index) {
+                this.index = index;
+                this.x = window.innerWidth / 2;
+                this.y = window.innerHeight / 2;
+                this.history = [];
+                // Higher index = slightly more lag (creates the whip effect)
+                this.lag = 0.15 + (index / STRAND_COUNT) * 0.1;
+                this.phaseOffset = (index / STRAND_COUNT) * Math.PI * 2;
+            }
 
-    const drawLine = (offset, color, width) => {
-      if (points.current.length < 3) return;
+            update() {
+                // 1. Calculate the ideal position around the mouse cursor
+                const orbitRadius = BASE_RADIUS + Math.sin(frame * 0.05 + this.phaseOffset) * 10;
+                const orbitX = target.x + Math.cos(frame * 0.02 + this.phaseOffset) * orbitRadius;
+                const orbitY = target.y + Math.sin(frame * 0.02 + this.phaseOffset) * orbitRadius;
 
-      ctx.beginPath();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = width;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      
-      // Apply a shadow for neon effect
-      ctx.shadowBlur = 10;
-      ctx.shadowColor = color;
+                // 2. Physics: Move current x/y towards orbit x/y with lerp
+                this.x += (orbitX - this.x) * this.lag;
+                this.y += (orbitY - this.y) * this.lag;
 
-      ctx.moveTo(points.current[0].x + offset.x, points.current[0].y + offset.y);
+                // 3. Update History for the tail
+                this.history.push({ x: this.x, y: this.y });
+                if (this.history.length > HISTORY_LENGTH) {
+                    this.history.shift();
+                }
+            }
 
-      for (let i = 1; i < points.current.length - 2; i++) {
-        const xc = (points.current[i].x + points.current[i + 1].x) / 2;
-        const yc = (points.current[i].y + points.current[i + 1].y) / 2;
-        ctx.quadraticCurveTo(
-          points.current[i].x + offset.x, 
-          points.current[i].y + offset.y, 
-          xc + offset.x, 
-          yc + offset.y
-        );
-      }
+            draw(context) {
+                if (this.history.length < 2) return;
 
-      // Finish the curve
-      const last = points.current.length - 1;
-      ctx.quadraticCurveTo(
-        points.current[last - 1].x + offset.x,
-        points.current[last - 1].y + offset.y,
-        points.current[last].x + offset.x,
-        points.current[last].y + offset.y
-      );
+                context.beginPath();
+                context.moveTo(this.history[0].x, this.history[0].y);
 
-      ctx.stroke();
-    };
+                for (let i = 1; i < this.history.length; i++) {
+                    context.lineTo(this.history[i].x, this.history[i].y);
+                }
 
-    const render = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // --- Dynamic Coloring ---
+                const speed = Math.abs(mouse.vX) + Math.abs(mouse.vY);
+                const hue = (frame * 2 + this.index * (360 / STRAND_COUNT)) % 360;
+                const lightness = isDark ? (60 + Math.min(speed, 20)) : (40 + Math.min(speed, 20));
 
-      if (points.current.length > 0) {
-        // Draw multiple lines to create the ribbon effect
-        drawLine({ x: -10, y: -5 }, colors[0], 2);
-        drawLine({ x: -5, y: 0 }, colors[1], 1.5);
-        drawLine({ x: 0, y: 5 }, colors[2], 1);
-        drawLine({ x: 5, y: 10 }, colors[3], 1.5);
-        drawLine({ x: 10, y: 15 }, colors[4], 2);
-      }
+                context.strokeStyle = `hsla(${hue}, 90%, ${lightness}%, 0.8)`;
+                context.lineWidth = 3;
+                context.lineCap = 'round';
+                context.lineJoin = 'round';
 
-      // Slowly remove points to create a trailing effect even if mouse stops
-      if (points.current.length > 0) {
-        // points.current.shift(); // Optional: more aggressive fade
-      }
+                // Glow effect
+                context.shadowBlur = 15;
+                context.shadowColor = `hsl(${hue}, 90%, 50%)`;
 
-      animationFrameId = requestAnimationFrame(render);
-    };
+                context.stroke();
+                context.shadowBlur = 0;
+            }
+        }
 
-    render();
+        // Initialize Strands
+        let strands = [];
+        for (let i = 0; i < STRAND_COUNT; i++) {
+            strands.push(new Strand(i));
+        }
 
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
+        // --- Main Loop ---
+        const animate = () => {
+            mouse.vX = (target.x - mouse.x) * 0.1;
+            mouse.vY = (target.y - mouse.y) * 0.1;
+            mouse.x += mouse.vX;
+            mouse.y += mouse.vY;
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 opacity-40 dark:opacity-60"
-      style={{ filter: 'blur(2px)' }}
-    />
-  );
+            frame++;
+
+            ctx.clearRect(0, 0, width, height);
+            
+            // Using lighter for that additive neon glow effect
+            ctx.globalCompositeOperation = 'lighter';
+
+            strands.forEach(strand => {
+                strand.update();
+                strand.draw(ctx);
+            });
+
+            requestAnimationFrame(animate);
+        };
+
+        const handleResize = () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        };
+
+        const handleMouseMove = (e) => {
+            target.x = e.clientX;
+            target.y = e.clientY;
+        };
+
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('mousemove', handleMouseMove);
+
+        handleResize();
+        animate();
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, [isDark]);
+
+    return (
+        <canvas
+            ref={canvasRef}
+            className="fixed inset-0 pointer-events-none z-0"
+        />
+    );
 };
 
 export default NeonRibbon;
