@@ -68,15 +68,18 @@ const NeonRibbon = () => {
                 // --- Dynamic Coloring ---
                 const speed = Math.abs(mouse.vX) + Math.abs(mouse.vY);
                 const hue = (frame * 2 + this.index * (360 / STRAND_COUNT)) % 360;
-                const lightness = isDark ? (60 + Math.min(speed, 20)) : (40 + Math.min(speed, 20));
+                
+                // Adjust for light mode: higher lightness and lower opacity
+                const lightness = isDark ? (60 + Math.min(speed, 20)) : (75 + Math.min(speed, 15));
+                const opacity = isDark ? 0.8 : 0.4;
 
-                context.strokeStyle = `hsla(${hue}, 90%, ${lightness}%, 0.8)`;
-                context.lineWidth = 3;
+                context.strokeStyle = `hsla(${hue}, 90%, ${lightness}%, ${opacity})`;
+                context.lineWidth = isDark ? 3 : 1.5;
                 context.lineCap = 'round';
                 context.lineJoin = 'round';
 
-                // Glow effect
-                context.shadowBlur = 15;
+                // Glow effect (Subtle in light mode)
+                context.shadowBlur = isDark ? 15 : 8;
                 context.shadowColor = `hsl(${hue}, 90%, 50%)`;
 
                 context.stroke();
@@ -86,9 +89,14 @@ const NeonRibbon = () => {
 
         // Initialize Strands
         let strands = [];
-        for (let i = 0; i < STRAND_COUNT; i++) {
-            strands.push(new Strand(i));
-        }
+        const initStrands = () => {
+            strands = [];
+            for (let i = 0; i < STRAND_COUNT; i++) {
+                strands.push(new Strand(i));
+            }
+        };
+
+        initStrands();
 
         // --- Main Loop ---
         const animate = () => {
@@ -101,13 +109,16 @@ const NeonRibbon = () => {
 
             ctx.clearRect(0, 0, width, height);
             
-            // Using lighter for that additive neon glow effect
-            ctx.globalCompositeOperation = 'lighter';
+            // Adjust blending mode for light mode
+            ctx.globalCompositeOperation = isDark ? 'lighter' : 'multiply';
+            if (!isDark) ctx.globalAlpha = 0.6;
 
             strands.forEach(strand => {
                 strand.update();
                 strand.draw(ctx);
             });
+            
+            if (!isDark) ctx.globalAlpha = 1;
 
             requestAnimationFrame(animate);
         };
