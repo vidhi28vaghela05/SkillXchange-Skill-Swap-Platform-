@@ -89,8 +89,16 @@ const Requests = () => {
                 {requests.received.map(req => (
                   <Card key={req._id} className="group flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-3 w-full">
-                      <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-lg">
-                        {req.fromUser.name.charAt(0)}
+                      <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg overflow-hidden flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-lg">
+                        {req.fromUser.avatar ? (
+                          <img 
+                            src={req.fromUser.avatar.startsWith('data:') ? req.fromUser.avatar : `https://api.dicebear.com/7.x/avataaars/svg?seed=${req.fromUser.avatar}`} 
+                            alt={req.fromUser.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          req.fromUser.name.charAt(0)
+                        )}
                       </div>
                       <div>
                         <h4 className="font-black text-slate-800 dark:text-slate-200 text-base">{req.fromUser.name}</h4>
@@ -166,8 +174,16 @@ const Requests = () => {
                 {requests.sent.map(req => (
                   <Card key={req._id} className="group flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-black text-lg">
-                        {req.toUser.name.charAt(0)}
+                      <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg overflow-hidden flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-black text-lg">
+                        {req.toUser.avatar ? (
+                          <img 
+                            src={req.toUser.avatar.startsWith('data:') ? req.toUser.avatar : `https://api.dicebear.com/7.x/avataaars/svg?seed=${req.toUser.avatar}`} 
+                            alt={req.toUser.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          req.toUser.name.charAt(0)
+                        )}
                       </div>
                       <div>
                         <h4 className="font-black text-slate-800 dark:text-slate-200 text-base">{req.toUser.name}</h4>

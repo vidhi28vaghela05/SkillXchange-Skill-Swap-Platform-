@@ -138,8 +138,16 @@ const Matches = () => {
               )}
               <div className="p-5 flex-grow relative z-10">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/40 dark:to-secondary-900/40 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400 font-black text-xl shadow-inner">
-                    {match.name.charAt(0)}
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/40 dark:to-secondary-900/40 rounded-lg overflow-hidden flex items-center justify-center text-primary-600 dark:text-primary-400 font-black text-xl shadow-inner">
+                    {match.avatar ? (
+                      <img 
+                        src={match.avatar.startsWith('data:') ? match.avatar : `https://api.dicebear.com/7.x/avataaars/svg?seed=${match.avatar}`} 
+                        alt={match.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      match.name.charAt(0)
+                    )}
                   </div>
                   <motion.button 
                     whileTap={{ scale: 0.8 }}

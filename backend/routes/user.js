@@ -16,10 +16,10 @@ router.get('/profile', auth, async (req, res) => {
 // @route PUT /users/profile
 router.put('/profile', auth, async (req, res) => {
   try {
-    const { skillsOffered, skillsWanted } = req.body;
+    const { skillsOffered, skillsWanted, bio, avatar } = req.body;
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { skillsOffered, skillsWanted },
+      { skillsOffered, skillsWanted, bio, avatar },
       { new: true }
     ).select('-password');
     res.json(user);

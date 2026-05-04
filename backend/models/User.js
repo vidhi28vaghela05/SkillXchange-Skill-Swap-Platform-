@@ -7,6 +7,8 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   skillsOffered: [{ type: String }],
   skillsWanted: [{ type: String }],
+  bio: { type: String, default: 'Passionate skill swapper!' },
+  avatar: { type: String, default: 'avatar1' },
 }, { timestamps: true });
 
 // Hash password before saving

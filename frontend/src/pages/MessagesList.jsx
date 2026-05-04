@@ -94,8 +94,16 @@ const MessagesList = () => {
                 }`}>
                   <div className="flex items-center gap-4 relative">
                     <div className="relative">
-                      <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 rounded-xl flex items-center justify-center font-black text-xl group-hover:scale-105 transition-transform">
-                        {contact.name.charAt(0)}
+                      <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 rounded-xl overflow-hidden flex items-center justify-center font-black text-xl group-hover:scale-105 transition-transform">
+                        {contact.avatar ? (
+                          <img 
+                            src={contact.avatar.startsWith('data:') ? contact.avatar : `https://api.dicebear.com/7.x/avataaars/svg?seed=${contact.avatar}`} 
+                            alt={contact.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-slate-600 dark:text-slate-300">{contact.name.charAt(0)}</span>
+                        )}
                       </div>
                       {unreadCounts[contact._id] && (
                         <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-white dark:border-[#111113] rounded-full animate-pulse"></span>

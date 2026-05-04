@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
-import { Send, ArrowLeft, Loader2 } from 'lucide-react';
+import { Send, ArrowLeft, Loader2, Video } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Chat = () => {
@@ -95,18 +95,34 @@ const Chat = () => {
         >
           <ArrowLeft size={20} />
         </button>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 rounded-lg flex items-center justify-center font-black text-lg">
-            {otherUser ? otherUser.name.charAt(0) : '?'}
+        <div className="flex items-center justify-between flex-1">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 rounded-lg flex items-center justify-center font-black text-lg">
+              {otherUser ? otherUser.name.charAt(0) : '?'}
+            </div>
+            <div>
+              <h2 className="font-extrabold text-slate-900 dark:text-white text-lg leading-tight">
+                {otherUser ? otherUser.name : 'Loading...'}
+              </h2>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Active Connection
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            <h2 className="font-extrabold text-slate-900 dark:text-white text-lg leading-tight">
-              {otherUser ? otherUser.name : 'Loading...'}
-            </h2>
-            <p className="text-xs font-semibold text-slate-400 dark:text-slate-500">
-              Skill Exchange Chat
-            </p>
-          </div>
+          
+          <button 
+            onClick={() => {
+              const room = `swap-${[user.id || user._id, userId].sort().join('-')}`;
+              api.post(`/messages/${userId}`, { text: `🎥 Join my video call: /video-call/${room}` });
+              navigate(`/video-call/${room}`);
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-xs font-black shadow-lg shadow-primary-500/20 transition-all active:scale-95"
+          >
+            <Video size={16} /> <span className="hidden sm:inline">Start Video Call</span>
+          </button>
         </div>
       </div>
 
@@ -139,7 +155,21 @@ const Chat = () => {
                     ? 'bg-primary-600 text-white rounded-br-sm shadow-lg shadow-primary-500/20' 
                     : 'bg-white dark:bg-white/10 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-white/5 rounded-bl-sm'
                 }`}>
-                  {msg.text}
+                  {msg.text.startsWith('🎥 Join my video call:') ? (
+                    <div className="flex flex-col gap-2">
+                      <p>{msg.text.split(': ')[0]}</p>
+                      <button 
+                        onClick={() => navigate(msg.text.split(': ')[1])}
+                        className={`py-2 px-4 rounded-lg font-black text-xs flex items-center justify-center gap-2 transition-all ${
+                          isMe ? 'bg-white text-primary-600' : 'bg-primary-600 text-white shadow-lg shadow-primary-500/20'
+                        }`}
+                      >
+                        <Video size={14} /> Join Meeting
+                      </button>
+                    </div>
+                  ) : (
+                    msg.text
+                  )}
                   <div className={`text-[9px] mt-1 text-right font-bold ${
                     isMe ? 'text-primary-200' : 'text-slate-400 dark:text-slate-500'
                   }`}>

@@ -11,6 +11,8 @@ const Dashboard = () => {
   const { user, setUser } = useAuth();
   const [skillsOffered, setSkillsOffered] = useState([]);
   const [skillsWanted, setSkillsWanted] = useState([]);
+  const [bio, setBio] = useState('');
+  const [avatar, setAvatar] = useState('avatar1');
   const [newOffered, setNewOffered] = useState('');
   const [newWanted, setNewWanted] = useState('');
   const [saving, setSaving] = useState(false);
@@ -20,6 +22,8 @@ const Dashboard = () => {
     if (user) {
       setSkillsOffered(user.skillsOffered || []);
       setSkillsWanted(user.skillsWanted || []);
+      setBio(user.bio || 'Passionate skill swapper!');
+      setAvatar(user.avatar || 'avatar1');
       
       // Fetch connections to calculate score
       const fetchStats = async () => {
@@ -52,7 +56,12 @@ const Dashboard = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await api.put('/users/profile', { skillsOffered, skillsWanted });
+      const res = await api.put('/users/profile', { 
+        skillsOffered, 
+        skillsWanted,
+        bio,
+        avatar
+      });
       setUser(res.data);
     } catch (err) {
       console.error(err);
@@ -101,76 +110,119 @@ const Dashboard = () => {
         </Button>
       </motion.div>
 
-      {/* Gamification Bar */}
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.1 }}
-        className="mb-10 bg-gradient-to-r from-fuchsia-600 to-indigo-600 rounded-3xl p-1 relative overflow-hidden shadow-2xl shadow-indigo-500/20"
-      >
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
-        <div className="bg-[#111113]/90 backdrop-blur-xl rounded-[1.4rem] p-6 flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+      <div className="grid md:grid-cols-3 gap-6 mb-10">
+        {/* Avatar & Bio */}
+        <Card className="md:col-span-1 flex flex-col items-center text-center p-6">
+          <div className="relative mb-4 group">
+             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 p-1 shadow-xl shadow-primary-500/20">
+                <img 
+                  src={avatar.startsWith('data:') ? avatar : `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatar}`} 
+                  alt="Avatar" 
+                  className="w-full h-full rounded-full bg-white dark:bg-[#111113] object-cover"
+                />
+             </div>
+             <label className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => setAvatar(reader.result);
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+                <div className="flex flex-col items-center">
+                  <Plus size={20} className="text-white mb-1" />
+                  <span className="text-[8px] text-white font-black uppercase">Upload</span>
+                </div>
+             </label>
+          </div>
+          <h2 className="text-xl font-black text-slate-900 dark:text-white mb-1">{user?.name}</h2>
+          <p className="text-[10px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest mb-4">Level {level} {getRankName(level)}</p>
           
-          <div className="flex items-center gap-5 w-full md:w-auto">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/30 border-4 border-[#111113]">
-              <Trophy className="text-white drop-shadow-md" size={32} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="bg-white/10 text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-white/10 uppercase tracking-wider">Level {level}</span>
-                <h3 className="text-white font-extrabold text-lg flex items-center gap-1">
-                  {getRankName(level)} <Award size={16} className="text-yellow-400" />
-                </h3>
-              </div>
-              <p className="text-slate-400 text-sm font-medium">Total XP: <span className="text-white font-bold">{score}</span></p>
-            </div>
+          <div className="w-full space-y-3">
+             <div className="text-left">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1 block">Your Bio</label>
+                <textarea 
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  placeholder="Tell people about your expertise..."
+                  className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs font-medium dark:text-slate-300 focus:ring-2 focus:ring-primary-500 focus:outline-none min-h-[80px] resize-none"
+                />
+             </div>
+             <div className="text-left">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2 block">Choose Avatar</label>
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                   {['Felix', 'Aneka', 'Vivian', 'Max', 'Luna'].map(seed => (
+                      <button 
+                        key={seed}
+                        onClick={() => setAvatar(seed)}
+                        className={`flex-shrink-0 w-10 h-10 rounded-lg border-2 transition-all ${
+                          avatar === seed ? 'border-primary-500 scale-110' : 'border-transparent opacity-50 hover:opacity-100'
+                        }`}
+                      >
+                         <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`} alt={seed} className="w-full h-full rounded-lg" />
+                      </button>
+                   ))}
+                </div>
+             </div>
           </div>
+        </Card>
 
-          <div className="w-full md:flex-1 max-w-md">
-            <div className="flex justify-between text-xs font-bold text-slate-400 mb-2">
-              <span>Progress to Level {level + 1}</span>
-              <span className="text-indigo-400">{progressToNext}%</span>
-            </div>
-            <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 relative">
-              <motion.div 
-                initial={{ width: 0 }}
-                animate={{ width: `${progressToNext}%` }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-                className="h-full bg-gradient-to-r from-fuchsia-500 to-indigo-500 rounded-full relative"
-              >
-                <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite] -translate-x-full" style={{ backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)' }}></div>
-              </motion.div>
-            </div>
-            
-            <div className="mt-4">
-              <button 
-                onClick={() => document.getElementById('xp-rules').classList.toggle('hidden')}
-                className="text-[11px] text-slate-400 hover:text-white flex items-center gap-1 font-bold ml-auto transition-colors"
-              >
-                How to earn XP?
-              </button>
-              <div id="xp-rules" className="hidden mt-3 bg-white/5 border border-white/10 rounded-xl p-3 text-[10px] sm:text-xs">
-                <h4 className="text-white font-bold mb-2">Quests & Rewards:</h4>
-                <ul className="space-y-1.5">
-                  <li className="flex justify-between items-center">
-                    <span className="text-slate-300">🎯 Add a Skill you offer</span>
-                    <span className="text-green-400 font-bold">+50 XP</span>
-                  </li>
-                  <li className="flex justify-between items-center">
-                    <span className="text-slate-300">📚 Add a Skill you want</span>
-                    <span className="text-green-400 font-bold">+20 XP</span>
-                  </li>
-                  <li className="flex justify-between items-center">
-                    <span className="text-slate-300">🤝 Make a new connection</span>
-                    <span className="text-green-400 font-bold">+150 XP</span>
-                  </li>
-                </ul>
+        {/* Gamification Stats */}
+        <div className="md:col-span-2 space-y-6">
+           <div className="bg-gradient-to-r from-fuchsia-600 to-indigo-600 rounded-3xl p-1 relative overflow-hidden shadow-xl shadow-indigo-500/20 h-full">
+              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+              <div className="bg-[#111113]/90 backdrop-blur-xl rounded-[1.4rem] p-6 h-full flex flex-col justify-between relative z-10">
+                 <div className="flex justify-between items-start mb-4">
+                    <div>
+                       <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Total Experience</p>
+                       <h3 className="text-3xl font-black text-white">{score} <span className="text-sm font-normal text-slate-500">XP</span></h3>
+                    </div>
+                    <div className="w-12 h-12 rounded-full bg-yellow-400 flex items-center justify-center shadow-lg shadow-yellow-400/20">
+                       <Trophy size={24} className="text-white" />
+                    </div>
+                 </div>
+                 
+                 <div className="space-y-4">
+                    <div>
+                       <div className="flex justify-between text-[10px] font-black text-slate-400 mb-2 uppercase tracking-wider">
+                          <span>Progress to Level {level + 1}</span>
+                          <span className="text-indigo-400">{progressToNext}%</span>
+                       </div>
+                       <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 relative">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progressToNext}%` }}
+                            transition={{ duration: 1.5 }}
+                            className="h-full bg-gradient-to-r from-fuchsia-500 to-indigo-500"
+                          />
+                       </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-2">
+                       <div className="bg-white/5 p-3 rounded-2xl border border-white/5 text-center">
+                          <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Level</p>
+                          <p className="text-lg font-black text-white">{level}</p>
+                       </div>
+                       <div className="bg-white/5 p-3 rounded-2xl border border-white/5 text-center">
+                          <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Skills</p>
+                          <p className="text-lg font-black text-white">{skillsOffered.length + skillsWanted.length}</p>
+                       </div>
+                       <div className="bg-white/5 p-3 rounded-2xl border border-white/5 text-center">
+                          <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Swaps</p>
+                          <p className="text-lg font-black text-white">{connectionsCount}</p>
+                       </div>
+                    </div>
+                 </div>
               </div>
-            </div>
-
-          </div>
+           </div>
         </div>
-      </motion.div>
+      </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Skills Offered */}
