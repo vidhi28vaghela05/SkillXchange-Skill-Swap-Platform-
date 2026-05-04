@@ -60,8 +60,8 @@ router.put('/:id/reject', auth, async (req, res) => {
 // @route GET /swap/my
 router.get('/my', auth, async (req, res) => {
   try {
-    const sent = await SwapRequest.find({ fromUser: req.user.id }).populate('toUser', 'name email offers wants');
-    const received = await SwapRequest.find({ toUser: req.user.id }).populate('fromUser', 'name email offers wants');
+    const sent = await SwapRequest.find({ fromUser: req.user.id }).populate('toUser', 'name email skillsOffered skillsWanted');
+    const received = await SwapRequest.find({ toUser: req.user.id }).populate('fromUser', 'name email skillsOffered skillsWanted');
     res.json({ sent, received });
   } catch (err) {
     res.status(500).json({ error: err.message });

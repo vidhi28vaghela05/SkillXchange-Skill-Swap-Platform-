@@ -33,7 +33,8 @@ router.get('/match', auth, async (req, res) => {
   try {
     const currentUser = await User.findById(req.user.id);
     
-    let matches = await User.find({
+    // 1. Find potential matches (people who have what you want OR want what you have)
+    let matchedUsers = await User.find({
       _id: { $ne: currentUser._id },
       $or: [
         { skillsOffered: { $in: currentUser.skillsWanted } },
@@ -41,12 +42,14 @@ router.get('/match', auth, async (req, res) => {
       ]
     }).select('-password');
 
-    // If no perfect matches, just return all other users for demo purposes
-    if (matches.length === 0) {
-      matches = await User.find({
-        _id: { $ne: currentUser._id }
-      }).select('-password').limit(10); // Show max 10 as suggestions
-    }
+    // 2. Find "Discoverable" users (people who don't necessarily match but are on the platform)
+    // We want to show a mix of matches and general users so discovery is possible
+    const otherUsers = await User.find({
+      _id: { $ne: currentUser._id, $not: { $in: matchedUsers.map(u => u._id) } }
+    }).select('-password').limit(10);
+
+    // Combine them, putting matches first
+    const matches = [...matchedUsers, ...otherUsers];
 
     res.json(matches);
   } catch (err) {
