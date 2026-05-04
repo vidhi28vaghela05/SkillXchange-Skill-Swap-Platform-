@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, ArrowUpRight, ArrowDownLeft, Clock, Inbox, MessageSquare } from 'lucide-react';
+import { Check, X, ArrowUpRight, ArrowDownLeft, Clock, Inbox, MessageSquare, ArrowRight } from 'lucide-react';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
@@ -23,6 +23,10 @@ const Requests = () => {
 
   useEffect(() => {
     fetchRequests();
+
+    // Auto-refresh every 5 seconds to catch new incoming requests
+    const interval = setInterval(fetchRequests, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleAction = async (id, action) => {
@@ -91,12 +95,13 @@ const Requests = () => {
                       <div>
                         <h4 className="font-black text-slate-800 dark:text-slate-200 text-base">{req.fromUser.name}</h4>
                         <p className="text-slate-400 dark:text-slate-500 text-xs font-semibold mb-2">{req.fromUser.email}</p>
-                        {req.fromUser.offers && req.fromUser.wants && (
-                          <div className="flex flex-wrap gap-2 text-[10px] uppercase font-bold mb-2">
-                            <span className="bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 px-2 py-0.5 rounded">Offers: {req.fromUser.offers.join(', ')}</span>
-                            <span className="bg-secondary-100 dark:bg-secondary-900/40 text-secondary-600 dark:text-secondary-400 px-2 py-0.5 rounded">Wants: {req.fromUser.wants.join(', ')}</span>
+                        <div className="flex flex-col gap-1.5 mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-black bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 px-2 py-0.5 rounded uppercase">Learn: {req.skillOffered}</span>
+                            <ArrowRight size={12} className="text-slate-400" />
+                            <span className="text-[9px] font-black bg-secondary-100 dark:bg-secondary-900/40 text-secondary-600 dark:text-secondary-400 px-2 py-0.5 rounded uppercase">Teach: {req.skillWanted}</span>
                           </div>
-                        )}
+                        </div>
                         <div className="mt-1 flex items-center gap-2">
                           <StatusBadge status={req.status} />
                           <span className="text-[9px] text-slate-300 dark:text-slate-500 font-bold flex items-center gap-1">
@@ -167,12 +172,13 @@ const Requests = () => {
                       <div>
                         <h4 className="font-black text-slate-800 dark:text-slate-200 text-base">{req.toUser.name}</h4>
                         <p className="text-slate-400 dark:text-slate-500 text-xs font-semibold mb-2">{req.toUser.email}</p>
-                        {req.toUser.offers && req.toUser.wants && (
-                          <div className="flex flex-wrap gap-2 text-[10px] uppercase font-bold mb-2">
-                            <span className="bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 px-2 py-0.5 rounded">Offers: {req.toUser.offers.join(', ')}</span>
-                            <span className="bg-secondary-100 dark:bg-secondary-900/40 text-secondary-600 dark:text-secondary-400 px-2 py-0.5 rounded">Wants: {req.toUser.wants.join(', ')}</span>
+                        <div className="flex flex-col gap-1.5 mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-black bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 px-2 py-0.5 rounded uppercase">Teach: {req.skillOffered}</span>
+                            <ArrowRight size={12} className="text-slate-400" />
+                            <span className="text-[9px] font-black bg-secondary-100 dark:bg-secondary-900/40 text-secondary-600 dark:text-secondary-400 px-2 py-0.5 rounded uppercase">Learn: {req.skillWanted}</span>
                           </div>
-                        )}
+                        </div>
                         <div className="mt-1 flex items-center gap-2">
                           <StatusBadge status={req.status} />
                           <span className="text-[9px] text-slate-300 dark:text-slate-500 font-bold flex items-center gap-1">

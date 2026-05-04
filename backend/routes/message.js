@@ -1,7 +1,22 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const Message = require('../models/Message');
+
+// @route GET /messages/unread/users
+// @desc Get unread counts grouped by sender
+router.get('/unread/users', auth, async (req, res) => {
+  try {
+    const unread = await Message.aggregate([
+      { $match: { receiver: new mongoose.Types.ObjectId(req.user.id), isRead: false } },
+      { $group: { _id: '$sender', count: { $sum: 1 } } }
+    ]);
+    res.json(unread);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // @route GET /messages/unread/count
 // @desc Get total unread messages count

@@ -35,7 +35,7 @@ const Navbar = () => {
       fetchData();
       
       // Poll every 5 seconds for demo purposes
-      const interval = setInterval(fetchData, 5000);
+      const interval = setInterval(fetchData, 2000);
       return () => clearInterval(interval);
     }
   }, [user]);

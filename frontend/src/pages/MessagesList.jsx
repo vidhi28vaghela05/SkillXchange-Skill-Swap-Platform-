@@ -7,20 +7,31 @@ import Card from '../components/Card';
 
 const MessagesList = () => {
   const [contacts, setContacts] = useState([]);
+  const [unreadCounts, setUnreadCounts] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const res = await api.get('/swap/my');
+        const [resSwap, resUnread] = await Promise.all([
+          api.get('/swap/my'),
+          api.get('/messages/unread/users')
+        ]);
         
-        const acceptedSent = res.data.sent
+        const acceptedSent = resSwap.data.sent
           .filter(req => req.status === 'accepted')
           .map(req => req.toUser);
           
-        const acceptedReceived = res.data.received
+        const acceptedReceived = resSwap.data.received
           .filter(req => req.status === 'accepted')
           .map(req => req.fromUser);
+
+        // Map unread counts to sender IDs
+        const unreadMap = {};
+        resUnread.data.forEach(item => {
+          unreadMap[item._id] = item.count;
+        });
+        setUnreadCounts(unreadMap);
 
         // Combine and remove duplicates by ID
         const allContacts = [...acceptedSent, ...acceptedReceived];
@@ -35,6 +46,13 @@ const MessagesList = () => {
     };
     
     fetchContacts();
+
+    // High-frequency refresh every 2 seconds for a real-time feel
+    const interval = setInterval(() => {
+      fetchContacts();
+    }, 2000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) return (
@@ -69,18 +87,35 @@ const MessagesList = () => {
               transition={{ delay: index * 0.05 }}
             >
               <Link to={`/chat/${contact._id}`}>
-                <Card className="group flex items-center justify-between p-5 hover:border-primary-300 dark:hover:border-primary-500/50 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 rounded-xl flex items-center justify-center font-black text-xl group-hover:scale-105 transition-transform">
-                      {contact.name.charAt(0)}
+                <Card className={`group flex items-center justify-between p-5 transition-all cursor-pointer ${
+                  unreadCounts[contact._id] 
+                    ? 'border-red-500 bg-red-500/5 ring-1 ring-red-500/20 shadow-lg shadow-red-500/5' 
+                    : 'hover:border-primary-300 dark:hover:border-primary-500/50'
+                }`}>
+                  <div className="flex items-center gap-4 relative">
+                    <div className="relative">
+                      <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 rounded-xl flex items-center justify-center font-black text-xl group-hover:scale-105 transition-transform">
+                        {contact.name.charAt(0)}
+                      </div>
+                      {unreadCounts[contact._id] && (
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-white dark:border-[#111113] rounded-full animate-pulse"></span>
+                      )}
                     </div>
                     <div>
                       <h4 className="font-extrabold text-slate-800 dark:text-slate-100 text-lg leading-tight">{contact.name}</h4>
                       <p className="text-slate-400 dark:text-slate-500 text-xs font-bold">{contact.email}</p>
                     </div>
                   </div>
-                  <div className="text-primary-600 dark:text-primary-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
-                    <ArrowRight size={20} />
+                  
+                  <div className="flex items-center gap-3">
+                    {unreadCounts[contact._id] && (
+                      <span className="bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-lg flex items-center justify-center min-w-[24px] shadow-lg shadow-red-500/30">
+                        {unreadCounts[contact._id]} New
+                      </span>
+                    )}
+                    <div className="text-slate-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 group-hover:translate-x-1 transition-all">
+                      <ArrowRight size={20} />
+                    </div>
                   </div>
                 </Card>
               </Link>
