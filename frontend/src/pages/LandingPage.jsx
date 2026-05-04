@@ -4,6 +4,7 @@ import { Zap, Shield, Users, ArrowRight, Star, CheckCircle, Sparkles, User } fro
 import Button from '../components/Button';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import NeonRibbon from '../components/NeonRibbon';
 
 const LandingPage = () => {
   const { user } = useAuth();
@@ -25,109 +26,116 @@ const LandingPage = () => {
     visible: { y: 0, opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 100, damping: 20 } }
   };
 
+  // Stable star data to avoid re-render jumps
+  const stars = [...Array(40)].map((_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    delay: Math.random() * 5,
+    duration: Math.random() * 5 + 5,
+    size: Math.random() * 2 + 1
+  }));
+
+  const streaks = [...Array(15)].map((_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    delay: Math.random() * 3,
+    duration: Math.random() * 2 + 1
+  }));
+
   return (
-    <div className="relative overflow-hidden bg-white dark:bg-[#030014] transition-colors duration-500 selection:bg-fuchsia-500/30 selection:text-fuchsia-600 dark:selection:text-fuchsia-200 min-h-screen">
+    <div className="relative overflow-hidden bg-transparent transition-colors duration-500 selection:bg-fuchsia-500/30 selection:text-fuchsia-600 dark:selection:text-fuchsia-200 min-h-screen">
       
-      {/* Dynamic Backgrounds */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      {/* Dynamic Backgrounds (Fixed to stay behind content) */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-white dark:bg-[#030014]">
         {isDark ? (
-          /* DARK MODE: Cosmic Rift Background */
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0"
-          >
-            {/* Deep Space Noise */}
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay z-10"></div>
+          <div className="absolute inset-0">
+            {/* Deep Space Base */}
+            <div className="absolute inset-0 bg-[#030014]"></div>
             
-            {/* Starfield */}
-            <div className="absolute inset-0 opacity-40 animate-pulse" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '50px 50px', animationDuration: '4s' }}></div>
-            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(255,255,255,0.6) 1.5px, transparent 1.5px)', backgroundSize: '120px 120px', transform: 'rotate(25deg)' }}></div>
-            
-            {/* The Rifts (Nebula Clouds) */}
-            <div className="absolute top-[10%] left-[-20%] w-[80%] h-[50%] bg-fuchsia-700/20 rounded-[100%] blur-[120px] -rotate-12 animate-pulse" style={{ animationDuration: '8s' }}></div>
-            <div className="absolute bottom-[-10%] right-[-20%] w-[80%] h-[50%] bg-indigo-700/20 rounded-[100%] blur-[120px] rotate-12 animate-pulse" style={{ animationDuration: '12s' }}></div>
-            <div className="absolute top-[40%] left-[20%] w-[60%] h-[60%] bg-violet-900/30 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '15s' }}></div>
-            
-            {/* The Cosmic Tear */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 0.4, scale: 1 }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent -rotate-45 blur-[1px]"
-            ></motion.div>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.2 }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[15px] bg-gradient-to-r from-transparent via-fuchsia-500 to-transparent -rotate-45 blur-[30px]"
-            ></motion.div>
-          </motion.div>
-        ) : (
-          /* LIGHT MODE: Ethereal Bloom Background */
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-slate-50/50"
-          >
-            {/* Grid Pattern */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#4f46e5 1px, transparent 1px), linear-gradient(90deg, #4f46e5 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-            
-            {/* Floating Soft Blobs - Spread across the page */}
-            <motion.div 
-              animate={{ x: [0, 80, 0], y: [0, 100, 0], scale: [1, 1.2, 1] }}
-              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-              className="absolute top-[5%] left-[-5%] w-[40%] h-[30%] bg-indigo-200/30 rounded-full blur-[120px]"
-            ></motion.div>
-            <motion.div 
-              animate={{ x: [0, -60, 0], y: [0, 150, 0], scale: [1, 1.3, 1] }}
-              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-              className="absolute top-[25%] right-[-5%] w-[45%] h-[35%] bg-fuchsia-200/30 rounded-full blur-[120px]"
-            ></motion.div>
-            <motion.div 
-              animate={{ x: [0, 100, 0], y: [0, -100, 0], scale: [1, 1.1, 1] }}
-              transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
-              className="absolute top-[50%] left-[10%] w-[35%] h-[30%] bg-cyan-200/20 rounded-full blur-[100px]"
-            ></motion.div>
-            <motion.div 
-              animate={{ x: [0, -50, 0], y: [0, 50, 0] }}
-              transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
-              className="absolute top-[75%] right-[10%] w-[40%] h-[35%] bg-indigo-100/30 rounded-full blur-[120px]"
-            ></motion.div>
-
-            {/* Premium Perspective Grid (Hero specific) */}
-            <div className="absolute top-0 left-0 right-0 h-[100vh] overflow-hidden [perspective:1000px]">
-              <div 
-                className="absolute inset-0 origin-center [transform:rotateX(60deg)] opacity-[0.4]"
-                style={{
-                  backgroundImage: 'linear-gradient(to right, rgba(79, 70, 229, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(79, 70, 229, 0.1) 1px, transparent 1px)',
-                  backgroundSize: '60px 60px',
-                  maskImage: 'radial-gradient(ellipse 60% 60% at 50% 50%, black, transparent)',
+            {/* Gravity Stars Layer 1 */}
+            {stars.map((star) => (
+              <motion.div
+                key={`star-${star.id}`}
+                initial={{ x: `${star.x}%`, y: -20, opacity: 0 }}
+                animate={{ 
+                  y: "110vh",
+                  opacity: [0, 1, 1, 0]
                 }}
-              >
-                <motion.div 
-                  animate={{ y: [0, 60] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-0"
-                  style={{
-                    backgroundImage: 'linear-gradient(to bottom, rgba(79, 70, 229, 0.4) 2px, transparent 2px)',
-                    backgroundSize: '100% 60px',
-                  }}
-                />
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent shadow-[0_0_30px_rgba(79,70,229,0.3)]"></div>
-            </div>
+                transition={{ 
+                  duration: star.duration, 
+                  repeat: Infinity, 
+                  delay: star.delay,
+                  ease: "linear" 
+                }}
+                className="absolute bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                style={{ width: star.size, height: star.size }}
+              />
+            ))}
 
-            {/* Subtle Scroll Grid for lower sections */}
-            <div 
-              className="absolute top-[100vh] inset-0 opacity-[0.03]"
-              style={{
-                backgroundImage: 'linear-gradient(#4f46e5 1px, transparent 1px), linear-gradient(90deg, #4f46e5 1px, transparent 1px)',
-                backgroundSize: '100px 100px'
-              }}
-            ></div>
-          </motion.div>
+            {/* Gravity Stars Layer 2 (Streaks) */}
+            {streaks.map((streak) => (
+              <motion.div
+                key={`streak-${streak.id}`}
+                initial={{ x: `${streak.x}%`, y: -100, opacity: 0 }}
+                animate={{ 
+                  y: "120vh",
+                  opacity: [0, 0.4, 0.4, 0]
+                }}
+                transition={{ 
+                  duration: streak.duration, 
+                  repeat: Infinity, 
+                  delay: streak.delay,
+                  ease: "linear" 
+                }}
+                className="absolute w-px h-24 bg-gradient-to-b from-transparent via-primary-500 to-transparent"
+              />
+            ))}
+
+            {/* Dark Mode Nebula Glows */}
+            <div className="absolute top-0 left-0 w-full h-full">
+              <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-[120px] animate-pulse"></div>
+              <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+            </div>
+          </div>
+        ) : (
+          <div className="absolute inset-0 bg-white">
+            {/* Animated Mesh Gradients (More vivid for visibility) */}
+            <div className="absolute inset-0 overflow-hidden">
+              <motion.div 
+                animate={{ 
+                  x: [-200, 200],
+                  y: [-100, 100],
+                  rotate: [0, 360]
+                }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute -top-[20%] -left-[10%] w-[80%] h-[80%] bg-indigo-200/40 blur-[100px] rounded-full"
+              ></motion.div>
+              <motion.div 
+                animate={{ 
+                  x: [200, -200],
+                  y: [100, -100],
+                  rotate: [360, 0]
+                }}
+                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                className="absolute -bottom-[20%] -right-[10%] w-[80%] h-[80%] bg-fuchsia-200/40 blur-[100px] rounded-full"
+              ></motion.div>
+              <motion.div 
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.5, 0.3]
+                }}
+                transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute top-[20%] right-[10%] w-[60%] h-[60%] bg-cyan-100/50 blur-[100px] rounded-full"
+              ></motion.div>
+            </div>
+            
+            {/* Light Mode Texture */}
+            <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(#4f46e5 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.08] mix-blend-overlay"></div>
+          </div>
         )}
+        {/* Interactive Neon Ribbon Effect */}
+        <NeonRibbon />
       </div>
 
       {/* Hero Section */}
@@ -195,7 +203,7 @@ const LandingPage = () => {
       </section>
 
       {/* Stats/Social Proof */}
-      <section className="relative z-10 py-10 border-y border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02]">
+      <section className="relative z-10 py-10 border-y border-slate-200 dark:border-white/5 bg-transparent">
         <div className="max-w-6xl mx-auto px-4 flex flex-wrap justify-around gap-8 md:gap-16 opacity-70 dark:opacity-60">
           <motion.div whileHover={{ scale: 1.05, opacity: 1 }} className="flex items-center gap-3 text-slate-900 dark:text-white font-bold text-lg cursor-pointer transition-all"><Zap className="text-yellow-500" size={24} /> Fast Matching</motion.div>
           <motion.div whileHover={{ scale: 1.05, opacity: 1 }} className="flex items-center gap-3 text-slate-900 dark:text-white font-bold text-lg cursor-pointer transition-all"><Shield className="text-emerald-500" size={24} /> Secure Swaps</motion.div>
@@ -231,7 +239,7 @@ const LandingPage = () => {
               <motion.div 
                 key={i}
                 variants={itemVariants}
-                className={`relative p-8 bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/5 rounded-3xl transition-all duration-500 group hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary-500/10 dark:hover:shadow-black/50 ${feature.border} overflow-hidden`}
+                className={`relative p-8 bg-white/40 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200 dark:border-white/5 rounded-3xl transition-all duration-500 group hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary-500/10 dark:hover:shadow-black/50 ${feature.border} overflow-hidden`}
               >
                 <div className={`absolute top-0 right-0 w-32 h-32 ${feature.bg} blur-[50px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
                 
@@ -247,7 +255,7 @@ const LandingPage = () => {
       </section>
 
       {/* How it Works */}
-      <section className="relative z-10 py-32 px-4 bg-slate-50/50 dark:bg-white/[0.02] border-y border-slate-200 dark:border-white/5">
+      <section className="relative z-10 py-32 px-4 bg-transparent border-y border-slate-200 dark:border-white/5">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center gap-16">
             <motion.div 
@@ -290,7 +298,7 @@ const LandingPage = () => {
               className="md:w-1/2 relative mt-8 md:mt-0 w-full"
             >
                <div className="absolute inset-0 bg-primary-600/20 blur-[100px] rounded-full animate-pulse"></div>
-               <div className="relative z-10 bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-[2rem] p-8 shadow-2xl backdrop-blur-xl rotate-3 hover:rotate-0 transition-transform duration-500">
+               <div className="relative z-10 bg-white/60 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-[2rem] p-8 shadow-2xl backdrop-blur-xl rotate-3 hover:rotate-0 transition-transform duration-500">
                   <div className="flex items-center gap-4 mb-8">
                     <div className="w-12 h-12 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400"><User size={24} /></div>
                     <div className="flex-1">
