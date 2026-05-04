@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
@@ -18,26 +19,28 @@ const PrivateRoute = ({ children }) => {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-slate-50 dark:bg-[#030014] transition-colors duration-300 relative text-slate-900 dark:text-white">
-          <Navbar />
-          <main className="min-h-screen relative z-10">
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-              <Route path="/matches" element={<PrivateRoute><Matches /></PrivateRoute>} />
-              <Route path="/requests" element={<PrivateRoute><Requests /></PrivateRoute>} />
-              <Route path="/messages" element={<PrivateRoute><MessagesList /></PrivateRoute>} />
-              <Route path="/chat/:userId" element={<PrivateRoute><Chat /></PrivateRoute>} />
-              <Route path="/admin" element={<AdminDashboard />} />
-            </Routes>
-          </main>
-        </div>
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen bg-white dark:bg-[#030014] transition-colors duration-300 relative text-slate-900 dark:text-white">
+            <Navbar />
+            <main className="min-h-screen relative z-10">
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                <Route path="/matches" element={<PrivateRoute><Matches /></PrivateRoute>} />
+                <Route path="/requests" element={<PrivateRoute><Requests /></PrivateRoute>} />
+                <Route path="/messages" element={<PrivateRoute><MessagesList /></PrivateRoute>} />
+                <Route path="/chat/:userId" element={<PrivateRoute><Chat /></PrivateRoute>} />
+                <Route path="/admin" element={<AdminDashboard />} />
+              </Routes>
+            </main>
+          </div>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

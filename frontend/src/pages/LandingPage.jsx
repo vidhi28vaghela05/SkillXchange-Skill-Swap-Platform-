@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { Zap, Shield, Users, ArrowRight, Star, CheckCircle, Sparkles, User } from 'lucide-react';
 import Button from '../components/Button';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const LandingPage = () => {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const { scrollYProgress } = useScroll();
   const yHero = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const opacityHero = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
@@ -24,34 +26,108 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="relative overflow-hidden bg-[#030014] selection:bg-fuchsia-500/30 selection:text-fuchsia-200 min-h-screen">
-      {/* Cosmic Rift Background */}
+    <div className="relative overflow-hidden bg-white dark:bg-[#030014] transition-colors duration-500 selection:bg-fuchsia-500/30 selection:text-fuchsia-600 dark:selection:text-fuchsia-200 min-h-screen">
+      
+      {/* Dynamic Backgrounds */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        {/* Deep Space Noise */}
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay z-10"></div>
-        
-        {/* Starfield */}
-        <div className="absolute inset-0 opacity-40 animate-pulse" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '50px 50px', animationDuration: '4s' }}></div>
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(255,255,255,0.6) 1.5px, transparent 1.5px)', backgroundSize: '120px 120px', transform: 'rotate(25deg)' }}></div>
-        
-        {/* The Rifts (Nebula Clouds) */}
-        <div className="absolute top-[10%] left-[-20%] w-[80%] h-[50%] bg-fuchsia-700/20 rounded-[100%] blur-[120px] -rotate-12 animate-pulse" style={{ animationDuration: '8s' }}></div>
-        <div className="absolute bottom-[-10%] right-[-20%] w-[80%] h-[50%] bg-indigo-700/20 rounded-[100%] blur-[120px] rotate-12 animate-pulse" style={{ animationDuration: '12s' }}></div>
-        <div className="absolute top-[40%] left-[20%] w-[60%] h-[60%] bg-violet-900/30 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '15s' }}></div>
-        
-        {/* The Cosmic Tear (Sharp glowing diagonal lines) */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 0.4, scale: 1 }}
-          transition={{ duration: 2, ease: "easeOut" }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent -rotate-45 blur-[1px]"
-        ></motion.div>
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.2 }}
-          transition={{ duration: 3, delay: 0.5 }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[15px] bg-gradient-to-r from-transparent via-fuchsia-500 to-transparent -rotate-45 blur-[30px]"
-        ></motion.div>
+        {isDark ? (
+          /* DARK MODE: Cosmic Rift Background */
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0"
+          >
+            {/* Deep Space Noise */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay z-10"></div>
+            
+            {/* Starfield */}
+            <div className="absolute inset-0 opacity-40 animate-pulse" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '50px 50px', animationDuration: '4s' }}></div>
+            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(255,255,255,0.6) 1.5px, transparent 1.5px)', backgroundSize: '120px 120px', transform: 'rotate(25deg)' }}></div>
+            
+            {/* The Rifts (Nebula Clouds) */}
+            <div className="absolute top-[10%] left-[-20%] w-[80%] h-[50%] bg-fuchsia-700/20 rounded-[100%] blur-[120px] -rotate-12 animate-pulse" style={{ animationDuration: '8s' }}></div>
+            <div className="absolute bottom-[-10%] right-[-20%] w-[80%] h-[50%] bg-indigo-700/20 rounded-[100%] blur-[120px] rotate-12 animate-pulse" style={{ animationDuration: '12s' }}></div>
+            <div className="absolute top-[40%] left-[20%] w-[60%] h-[60%] bg-violet-900/30 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '15s' }}></div>
+            
+            {/* The Cosmic Tear */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 0.4, scale: 1 }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent -rotate-45 blur-[1px]"
+            ></motion.div>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.2 }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[15px] bg-gradient-to-r from-transparent via-fuchsia-500 to-transparent -rotate-45 blur-[30px]"
+            ></motion.div>
+          </motion.div>
+        ) : (
+          /* LIGHT MODE: Ethereal Bloom Background */
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-slate-50/50"
+          >
+            {/* Grid Pattern */}
+            <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#4f46e5 1px, transparent 1px), linear-gradient(90deg, #4f46e5 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+            
+            {/* Floating Soft Blobs - Spread across the page */}
+            <motion.div 
+              animate={{ x: [0, 80, 0], y: [0, 100, 0], scale: [1, 1.2, 1] }}
+              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+              className="absolute top-[5%] left-[-5%] w-[40%] h-[30%] bg-indigo-200/30 rounded-full blur-[120px]"
+            ></motion.div>
+            <motion.div 
+              animate={{ x: [0, -60, 0], y: [0, 150, 0], scale: [1, 1.3, 1] }}
+              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+              className="absolute top-[25%] right-[-5%] w-[45%] h-[35%] bg-fuchsia-200/30 rounded-full blur-[120px]"
+            ></motion.div>
+            <motion.div 
+              animate={{ x: [0, 100, 0], y: [0, -100, 0], scale: [1, 1.1, 1] }}
+              transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+              className="absolute top-[50%] left-[10%] w-[35%] h-[30%] bg-cyan-200/20 rounded-full blur-[100px]"
+            ></motion.div>
+            <motion.div 
+              animate={{ x: [0, -50, 0], y: [0, 50, 0] }}
+              transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+              className="absolute top-[75%] right-[10%] w-[40%] h-[35%] bg-indigo-100/30 rounded-full blur-[120px]"
+            ></motion.div>
+
+            {/* Premium Perspective Grid (Hero specific) */}
+            <div className="absolute top-0 left-0 right-0 h-[100vh] overflow-hidden [perspective:1000px]">
+              <div 
+                className="absolute inset-0 origin-center [transform:rotateX(60deg)] opacity-[0.4]"
+                style={{
+                  backgroundImage: 'linear-gradient(to right, rgba(79, 70, 229, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(79, 70, 229, 0.1) 1px, transparent 1px)',
+                  backgroundSize: '60px 60px',
+                  maskImage: 'radial-gradient(ellipse 60% 60% at 50% 50%, black, transparent)',
+                }}
+              >
+                <motion.div 
+                  animate={{ y: [0, 60] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0"
+                  style={{
+                    backgroundImage: 'linear-gradient(to bottom, rgba(79, 70, 229, 0.4) 2px, transparent 2px)',
+                    backgroundSize: '100% 60px',
+                  }}
+                />
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent shadow-[0_0_30px_rgba(79,70,229,0.3)]"></div>
+            </div>
+
+            {/* Subtle Scroll Grid for lower sections */}
+            <div 
+              className="absolute top-[100vh] inset-0 opacity-[0.03]"
+              style={{
+                backgroundImage: 'linear-gradient(#4f46e5 1px, transparent 1px), linear-gradient(90deg, #4f46e5 1px, transparent 1px)',
+                backgroundSize: '100px 100px'
+              }}
+            ></div>
+          </motion.div>
+        )}
       </div>
 
       {/* Hero Section */}
@@ -61,9 +137,9 @@ const LandingPage = () => {
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-full text-primary-400 text-xs font-bold mb-8 shadow-2xl shadow-primary-500/10 hover:bg-white/10 transition-colors cursor-default"
+            className="inline-flex items-center gap-2 bg-slate-900/5 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 px-4 py-2 rounded-full text-primary-600 dark:text-primary-400 text-xs font-bold mb-8 shadow-xl dark:shadow-2xl shadow-primary-500/5 dark:shadow-primary-500/10 hover:bg-slate-900/10 dark:hover:bg-white/10 transition-colors cursor-default"
           >
-            <Sparkles size={14} className="animate-pulse text-yellow-400" />
+            <Sparkles size={14} className="animate-pulse text-yellow-500 dark:text-yellow-400" />
             <span className="tracking-wide">Powered by Advanced Matching AI</span>
           </motion.div>
           
@@ -71,11 +147,11 @@ const LandingPage = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-5xl md:text-7xl font-black text-white leading-tight mb-8 tracking-tighter"
+            className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white leading-tight mb-8 tracking-tighter"
           >
             Exchange <span className="relative inline-block">
-              <span className="absolute -inset-2 bg-gradient-to-r from-fuchsia-600 to-cyan-600 blur-2xl opacity-40 animate-pulse"></span>
-              <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 via-white to-cyan-400">Skills</span>
+              <span className="absolute -inset-2 bg-gradient-to-r from-fuchsia-600 to-cyan-600 blur-2xl opacity-20 dark:opacity-40 animate-pulse"></span>
+              <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-600 via-primary-600 to-cyan-600 dark:from-fuchsia-400 dark:via-white dark:to-cyan-400">Skills</span>
             </span>, <br /> Not Money.
           </motion.h1>
           
@@ -83,7 +159,7 @@ const LandingPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed"
+            className="text-slate-600 dark:text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed"
           >
             Unlock your true potential by connecting with global experts. Share your mastery, learn what you desire—completely free.
           </motion.p>
@@ -96,21 +172,21 @@ const LandingPage = () => {
           >
             {user ? (
               <Link to="/dashboard">
-                <Button className="px-8 py-4 text-base rounded-2xl group shadow-[0_0_40px_rgba(217,70,239,0.4)] hover:shadow-[0_0_60px_rgba(217,70,239,0.6)] !bg-gradient-to-r !from-fuchsia-600 !to-indigo-600 border-none transition-all overflow-hidden relative">
+                <Button className="px-8 py-4 text-base rounded-2xl group shadow-[0_0_40px_rgba(79,70,229,0.3)] dark:shadow-[0_0_40px_rgba(217,70,239,0.4)] hover:shadow-[0_0_60px_rgba(79,70,229,0.5)] dark:hover:shadow-[0_0_60px_rgba(217,70,239,0.6)] !bg-gradient-to-r !from-primary-600 !to-indigo-600 dark:!from-fuchsia-600 dark:!to-indigo-600 border-none transition-all overflow-hidden relative">
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
                   <span className="relative flex items-center gap-2">Go to Dashboard <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} /></span>
                 </Button>
               </Link>
             ) : (
               <Link to="/register">
-                <Button className="px-8 py-4 text-base rounded-2xl group shadow-[0_0_40px_rgba(217,70,239,0.4)] hover:shadow-[0_0_60px_rgba(217,70,239,0.6)] !bg-gradient-to-r !from-fuchsia-600 !to-indigo-600 border-none transition-all overflow-hidden relative">
+                <Button className="px-8 py-4 text-base rounded-2xl group shadow-[0_0_40px_rgba(79,70,229,0.3)] dark:shadow-[0_0_40px_rgba(217,70,239,0.4)] hover:shadow-[0_0_60px_rgba(79,70,229,0.5)] dark:hover:shadow-[0_0_60px_rgba(217,70,239,0.6)] !bg-gradient-to-r !from-primary-600 !to-indigo-600 dark:!from-fuchsia-600 dark:!to-indigo-600 border-none transition-all overflow-hidden relative">
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
                   <span className="relative flex items-center gap-2">Get Started Free <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} /></span>
                 </Button>
               </Link>
             )}
             <Link to={user ? "/matches" : "/login"}>
-              <button className="px-8 py-4 text-base font-bold text-white border border-white/10 bg-white/5 backdrop-blur-md rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all shadow-xl">
+              <button className="px-8 py-4 text-base font-bold text-slate-700 dark:text-white border border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md rounded-2xl hover:bg-white/80 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all shadow-xl">
                 View Live Matches
               </button>
             </Link>
@@ -118,16 +194,16 @@ const LandingPage = () => {
         </motion.div>
       </section>
 
-      {/* Stats/Social Proof - Infinite Scroll simulation */}
-      <section className="relative z-10 py-10 border-y border-white/5 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent">
-        <div className="max-w-6xl mx-auto px-4 flex flex-wrap justify-around gap-8 md:gap-16 opacity-60">
-          <motion.div whileHover={{ scale: 1.1, opacity: 1 }} className="flex items-center gap-3 text-white font-bold text-lg cursor-pointer transition-all"><Zap className="text-yellow-400" size={24} /> Fast Matching</motion.div>
-          <motion.div whileHover={{ scale: 1.1, opacity: 1 }} className="flex items-center gap-3 text-white font-bold text-lg cursor-pointer transition-all"><Shield className="text-emerald-400" size={24} /> Secure Swaps</motion.div>
-          <motion.div whileHover={{ scale: 1.1, opacity: 1 }} className="flex items-center gap-3 text-white font-bold text-lg cursor-pointer transition-all"><Users className="text-blue-400" size={24} /> 50k+ Community</motion.div>
+      {/* Stats/Social Proof */}
+      <section className="relative z-10 py-10 border-y border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02]">
+        <div className="max-w-6xl mx-auto px-4 flex flex-wrap justify-around gap-8 md:gap-16 opacity-70 dark:opacity-60">
+          <motion.div whileHover={{ scale: 1.05, opacity: 1 }} className="flex items-center gap-3 text-slate-900 dark:text-white font-bold text-lg cursor-pointer transition-all"><Zap className="text-yellow-500" size={24} /> Fast Matching</motion.div>
+          <motion.div whileHover={{ scale: 1.05, opacity: 1 }} className="flex items-center gap-3 text-slate-900 dark:text-white font-bold text-lg cursor-pointer transition-all"><Shield className="text-emerald-500" size={24} /> Secure Swaps</motion.div>
+          <motion.div whileHover={{ scale: 1.05, opacity: 1 }} className="flex items-center gap-3 text-slate-900 dark:text-white font-bold text-lg cursor-pointer transition-all"><Users className="text-blue-500" size={24} /> 50k+ Community</motion.div>
         </div>
       </section>
 
-      {/* Features Section (Forge UI Style Cards) */}
+      {/* Features Section */}
       <section className="relative z-10 py-32 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div 
@@ -136,8 +212,8 @@ const LandingPage = () => {
             viewport={{ once: true, margin: "-100px" }}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">Built for the Modern Learner.</h2>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto">Everything you need to master new skills through collaboration, wrapped in a beautiful, intuitive interface.</p>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Built for the Modern Learner.</h2>
+            <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">Everything you need to master new skills through collaboration, wrapped in a beautiful, intuitive interface.</p>
           </motion.div>
 
           <motion.div 
@@ -148,31 +224,30 @@ const LandingPage = () => {
             className="grid md:grid-cols-3 gap-8"
           >
             {[
-              { title: 'Intelligent Matching', desc: 'Our algorithm finds the perfect mutual exchange based on your specific needs and timeline.', icon: Zap, color: 'text-primary-400', bg: 'bg-primary-500/10', border: 'group-hover:border-primary-500/50' },
-              { title: 'Community Verified', desc: 'Connect with confidence through our verified user system, detailed profiles, and ratings.', icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-500/10', border: 'group-hover:border-green-500/50' },
-              { title: 'Limitless Growth', desc: 'Swap any skill imaginable—from Advanced React Coding to Authentic Italian Cooking.', icon: Star, color: 'text-secondary-400', bg: 'bg-secondary-500/10', border: 'group-hover:border-secondary-500/50' }
+              { title: 'Intelligent Matching', desc: 'Our algorithm finds the perfect mutual exchange based on your specific needs and timeline.', icon: Zap, color: 'text-primary-600 dark:text-primary-400', bg: 'bg-primary-500/10', border: 'hover:border-primary-500/50' },
+              { title: 'Community Verified', desc: 'Connect with confidence through our verified user system, detailed profiles, and ratings.', icon: CheckCircle, color: 'text-emerald-600 dark:text-green-400', bg: 'bg-emerald-500/10', border: 'hover:border-emerald-500/50' },
+              { title: 'Limitless Growth', desc: 'Swap any skill imaginable—from Advanced React Coding to Authentic Italian Cooking.', icon: Star, color: 'text-secondary-600 dark:text-secondary-400', bg: 'bg-secondary-500/10', border: 'hover:border-secondary-500/50' }
             ].map((feature, i) => (
               <motion.div 
                 key={i}
                 variants={itemVariants}
-                className={`relative p-8 bg-[#111113] border border-white/5 rounded-3xl transition-all duration-500 group hover:-translate-y-2 hover:shadow-2xl hover:shadow-black/50 ${feature.border} overflow-hidden`}
+                className={`relative p-8 bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/5 rounded-3xl transition-all duration-500 group hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary-500/10 dark:hover:shadow-black/50 ${feature.border} overflow-hidden`}
               >
-                {/* Hover Glow Effect */}
                 <div className={`absolute top-0 right-0 w-32 h-32 ${feature.bg} blur-[50px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
                 
-                <div className={`w-14 h-14 rounded-2xl bg-[#1a1a1d] border border-white/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500 shadow-inner ${feature.color}`}>
+                <div className={`w-14 h-14 rounded-2xl bg-slate-50 dark:bg-[#1a1a1d] border border-slate-100 dark:border-white/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500 shadow-inner ${feature.color}`}>
                   <feature.icon size={28} />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3 tracking-tight">{feature.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed font-medium">{feature.desc}</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">{feature.title}</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">{feature.desc}</p>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      {/* How it Works (Vengence UI / Lora UI Blocks) */}
-      <section className="relative z-10 py-32 px-4 bg-white/[0.02] border-y border-white/5">
+      {/* How it Works */}
+      <section className="relative z-10 py-32 px-4 bg-slate-50/50 dark:bg-white/[0.02] border-y border-slate-200 dark:border-white/5">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center gap-16">
             <motion.div 
@@ -181,7 +256,7 @@ const LandingPage = () => {
               viewport={{ once: true }}
               className="md:w-1/2"
             >
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-8 leading-tight tracking-tight">Master anything <br /> in 3 simple steps.</h2>
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-8 leading-tight tracking-tight">Master anything <br /> in 3 simple steps.</h2>
               <div className="space-y-10">
                 {[
                   { step: '01', title: 'List your Skills', desc: 'Tell the world what you know and what you want to learn with precision.' },
@@ -197,11 +272,11 @@ const LandingPage = () => {
                     className="flex gap-6 group"
                   >
                     <div className="relative">
-                      <span className="text-transparent bg-clip-text bg-gradient-to-b from-primary-400 to-primary-800 font-black text-3xl group-hover:scale-110 transition-transform inline-block">{item.step}</span>
+                      <span className="text-transparent bg-clip-text bg-gradient-to-b from-primary-600 to-primary-900 dark:from-primary-400 dark:to-primary-800 font-black text-3xl group-hover:scale-110 transition-transform inline-block">{item.step}</span>
                     </div>
                     <div>
-                      <h4 className="text-xl font-bold text-white mb-2 group-hover:text-primary-300 transition-colors">{item.title}</h4>
-                      <p className="text-slate-400 text-base leading-relaxed">{item.desc}</p>
+                      <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-300 transition-colors">{item.title}</h4>
+                      <p className="text-slate-600 dark:text-slate-400 text-base leading-relaxed">{item.desc}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -215,19 +290,18 @@ const LandingPage = () => {
               className="md:w-1/2 relative mt-8 md:mt-0 w-full"
             >
                <div className="absolute inset-0 bg-primary-600/20 blur-[100px] rounded-full animate-pulse"></div>
-               {/* Abstract UI representation instead of a missing image */}
-               <div className="relative z-10 bg-[#111113] border border-white/10 rounded-[2rem] p-8 shadow-2xl backdrop-blur-xl rotate-3 hover:rotate-0 transition-transform duration-500">
+               <div className="relative z-10 bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-[2rem] p-8 shadow-2xl backdrop-blur-xl rotate-3 hover:rotate-0 transition-transform duration-500">
                   <div className="flex items-center gap-4 mb-8">
-                    <div className="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400"><User size={24} /></div>
+                    <div className="w-12 h-12 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400"><User size={24} /></div>
                     <div className="flex-1">
-                      <div className="h-4 bg-white/10 rounded w-24 mb-2"></div>
-                      <div className="h-3 bg-white/5 rounded w-32"></div>
+                      <div className="h-4 bg-slate-200 dark:bg-white/10 rounded w-24 mb-2"></div>
+                      <div className="h-3 bg-slate-100 dark:bg-white/5 rounded w-32"></div>
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400"><CheckCircle size={16} /></div>
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400"><CheckCircle size={16} /></div>
                   </div>
                   <div className="space-y-4">
-                    <div className="h-16 bg-white/5 rounded-2xl border border-white/5"></div>
-                    <div className="h-16 bg-white/5 rounded-2xl border border-white/5"></div>
+                    <div className="h-16 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5"></div>
+                    <div className="h-16 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5"></div>
                   </div>
                   <div className="mt-8 flex gap-4">
                     <div className="h-10 bg-primary-600 rounded-xl w-full"></div>
@@ -238,33 +312,32 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* CTA Footer (Animate UI Style) */}
+      {/* CTA Footer */}
       <section className="relative z-10 py-32 px-4 text-center">
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, type: 'spring' }}
           viewport={{ once: true }}
-          className="max-w-4xl mx-auto bg-[#0a0a0b] border border-white/10 p-16 rounded-[3rem] shadow-2xl overflow-hidden relative group"
+          className="max-w-4xl mx-auto bg-white dark:bg-[#0a0a0b] border border-slate-200 dark:border-white/10 p-16 rounded-[3rem] shadow-2xl overflow-hidden relative group"
         >
-          {/* Animated gradient background sweep */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 via-secondary-600/20 to-primary-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-[length:200%_auto] animate-gradient-x"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-600/5 via-secondary-600/5 to-primary-600/5 dark:from-primary-600/20 dark:via-secondary-600/20 dark:to-primary-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-[length:200%_auto] animate-gradient-x"></div>
           
-          <div className="absolute top-[-50%] right-[-10%] w-96 h-96 bg-primary-600/30 rounded-full blur-[100px]"></div>
-          <div className="absolute bottom-[-50%] left-[-10%] w-96 h-96 bg-secondary-600/30 rounded-full blur-[100px]"></div>
+          <div className="absolute top-[-50%] right-[-10%] w-96 h-96 bg-primary-600/10 dark:bg-primary-600/30 rounded-full blur-[100px]"></div>
+          <div className="absolute bottom-[-50%] left-[-10%] w-96 h-96 bg-secondary-600/10 dark:bg-secondary-600/30 rounded-full blur-[100px]"></div>
           
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-6 relative z-10 tracking-tight">Ready to join the <br /> skill revolution?</h2>
-          <p className="text-slate-400 text-lg mb-10 relative z-10 max-w-lg mx-auto">Join thousands of professionals already accelerating their careers through mutual skill exchange.</p>
+          <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 relative z-10 tracking-tight">Ready to join the <br /> skill revolution?</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-lg mb-10 relative z-10 max-w-lg mx-auto">Join thousands of professionals already accelerating their careers through mutual skill exchange.</p>
           
           {user ? (
             <Link to="/dashboard" className="relative z-10 inline-block">
-              <Button className="px-10 py-4 text-lg bg-white !text-primary-900 hover:bg-slate-100 shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 rounded-2xl font-black">
+              <Button className="px-10 py-4 text-lg !bg-primary-600 dark:!bg-white !text-white dark:!text-primary-900 hover:!bg-primary-700 dark:hover:bg-slate-100 shadow-[0_0_40px_rgba(79,70,229,0.2)] dark:shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(79,70,229,0.4)] dark:hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 rounded-2xl font-black">
                 Go to Dashboard
               </Button>
             </Link>
           ) : (
             <Link to="/register" className="relative z-10 inline-block">
-              <Button className="px-10 py-4 text-lg bg-white !text-primary-900 hover:bg-slate-100 shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 rounded-2xl font-black">
+              <Button className="px-10 py-4 text-lg !bg-primary-600 dark:!bg-white !text-white dark:!text-primary-900 hover:!bg-primary-700 dark:hover:bg-slate-100 shadow-[0_0_40px_rgba(79,70,229,0.2)] dark:shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(79,70,229,0.4)] dark:hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 rounded-2xl font-black">
                 Join Now — It's Free
               </Button>
             </Link>
@@ -272,11 +345,11 @@ const LandingPage = () => {
         </motion.div>
       </section>
 
-      <footer className="relative z-10 py-10 border-t border-white/5 bg-[#050505]">
+      <footer className="relative z-10 py-10 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#050505]">
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500">
           <p className="font-bold text-sm tracking-wide">© 2026 SkillXchange. Built for the future of learning.</p>
           <div className="flex gap-6">
-            <Link to="/admin" className="text-sm font-bold hover:text-white transition-colors">Admin Panel</Link>
+            <Link to="/admin" className="text-sm font-bold hover:text-slate-900 dark:hover:text-white transition-colors">Admin Panel</Link>
           </div>
         </div>
       </footer>

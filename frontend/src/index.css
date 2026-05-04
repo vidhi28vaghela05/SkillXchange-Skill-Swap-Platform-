@@ -35,9 +35,13 @@ body {
   animation: float 6s ease-in-out infinite;
 }
 
-.animate-gradient-x {
-  background-size: 200% 200%;
-  animation: gradient-x 5s ease infinite;
+@keyframes grid-move {
+  0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+  100% { transform: perspective(500px) rotateX(60deg) translateY(40px); }
+}
+
+.animate-grid-move {
+  animation: grid-move 2s linear infinite;
 }
 
 ::-webkit-scrollbar {
