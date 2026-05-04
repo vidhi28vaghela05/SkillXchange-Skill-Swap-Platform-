@@ -4,14 +4,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, CheckCircle, Search, User, ExternalLink, Heart } from 'lucide-react';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
+import { X, ArrowRight } from 'lucide-react';
 
 const Matches = () => {
+  const { user: currentUser } = useAuth();
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sentRequests, setSentRequests] = useState([]);
   const [bookmarks, setBookmarks] = useState(() => JSON.parse(localStorage.getItem('bookmarks') || '[]'));
-
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Selection state
+  const [showModal, setShowModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [skillOffered, setSkillOffered] = useState('');
+  const [skillWanted, setSkillWanted] = useState('');
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -43,13 +51,30 @@ const Matches = () => {
     }
   };
 
-  const sendRequest = async (toUserId) => {
+  const sendRequest = async () => {
+    if (!skillOffered || !skillWanted) return alert('Please select both skills');
     try {
-      await api.post('/swap/request', { toUserId });
-      setSentRequests([...sentRequests, toUserId]);
+      await api.post('/swap/request', { 
+        toUserId: selectedUser._id,
+        skillOffered,
+        skillWanted
+      });
+      setSentRequests([...sentRequests, selectedUser._id]);
+      setShowModal(false);
+      setSelectedUser(null);
+      setSkillOffered('');
+      setSkillWanted('');
     } catch (err) {
-      alert('Failed to send request');
+      alert(err.response?.data?.message || 'Failed to send request');
     }
+  };
+
+  const openModal = (user) => {
+    setSelectedUser(user);
+    setShowModal(true);
+    // Auto-select if only one option exists
+    if (currentUser?.skillsOffered?.length === 1) setSkillOffered(currentUser.skillsOffered[0]);
+    if (user.skillsOffered?.length === 1) setSkillWanted(user.skillsOffered[0]);
   };
 
   const filteredMatches = matches.filter(match => {
@@ -160,7 +185,7 @@ const Matches = () => {
                   </div>
                 ) : (
                   <Button 
-                    onClick={() => sendRequest(match._id)}
+                    onClick={() => openModal(match)}
                     className="w-full py-2.5 rounded-lg text-sm"
                   >
                     Connect <Send size={14} />
@@ -172,6 +197,69 @@ const Matches = () => {
           })}
         </div>
       )}
+
+      {/* Skill Selection Modal */}
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowModal(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            ></motion.div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 w-full max-w-md rounded-2xl shadow-2xl relative z-10 overflow-hidden"
+            >
+              <div className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center">
+                <h3 className="text-xl font-black text-slate-900 dark:text-white">Customize Swap</h3>
+                <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-6 space-y-6">
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2 block">I will teach:</label>
+                  <select 
+                    value={skillOffered}
+                    onChange={(e) => setSkillOffered(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 dark:text-white rounded-xl py-3 px-4 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Select a skill...</option>
+                    {currentUser?.skillsOffered?.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+
+                <div className="flex justify-center">
+                  <div className="p-2 bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 rounded-full">
+                    <ArrowRight size={20} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2 block">I want to learn:</label>
+                  <select 
+                    value={skillWanted}
+                    onChange={(e) => setSkillWanted(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 dark:text-white rounded-xl py-3 px-4 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Select a skill...</option>
+                    {selectedUser?.skillsOffered?.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+
+                <Button onClick={sendRequest} className="w-full py-4 text-base font-black shadow-xl shadow-primary-500/30">
+                  Send Swap Request
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

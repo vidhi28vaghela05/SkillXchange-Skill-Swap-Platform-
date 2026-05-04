@@ -6,18 +6,22 @@ const SwapRequest = require('../models/SwapRequest');
 // @route POST /swap/request
 router.post('/request', auth, async (req, res) => {
   try {
-    const { toUserId } = req.body;
+    const { toUserId, skillOffered, skillWanted } = req.body;
     const existingRequest = await SwapRequest.findOne({
       fromUser: req.user.id,
       toUser: toUserId,
+      skillOffered,
+      skillWanted,
       status: 'pending'
     });
 
-    if (existingRequest) return res.status(400).json({ message: 'Request already sent' });
+    if (existingRequest) return res.status(400).json({ message: 'Request already sent for these skills' });
 
     const newRequest = new SwapRequest({
       fromUser: req.user.id,
-      toUser: toUserId
+      toUser: toUserId,
+      skillOffered,
+      skillWanted
     });
 
     await newRequest.save();
